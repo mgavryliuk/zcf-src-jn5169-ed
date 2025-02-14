@@ -1,4 +1,8 @@
 build
+toolchain/**
 Build-make
 .cproject
 .project
+.DS_Store
+
+!.keep
