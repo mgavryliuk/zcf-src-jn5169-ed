@@ -7,29 +7,38 @@
     },
     "configurePresets": [
       {
-        "name": "default",
-        "displayName": "Default Config Windows",
+        "name": "ubuntu",
+        "displayName": "Ubuntu Preset",
+        "description": "Default build using Unix Makefiles generator",
+        "generator": "Unix Makefiles",
+        "binaryDir": "${sourceDir}/build",
+        "cacheVariables": {
+          "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake"
+        }
+      },
+      {
+        "name": "windows",
+        "displayName": "Windows Preset",
         "description": "Default build using MinGW32 generator, and sets pointers to NXP SDK at default locations",
         "generator": "MinGW Makefiles",
         "binaryDir": "${sourceDir}/build",
         "cacheVariables": {
-          "TOOLCHAIN_PREFIX": {
-            "type": "STRING",
-            "value": "D:/Programs/bstudio_nxp/sdk/Tools/ba-elf-ba2-r36379"
-          },
-          "SDK_PREFIX": {
-            "type": "STRING",
-            "value": "D:/Programs/bstudio_nxp/sdk/JN-SW-4170"
-          }
+          "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake"
         }
       }
     ],
     "buildPresets": [
       {
-        "name": "default",
+        "name": "ubuntu",
         "configuration": "Release",
-        "configurePreset": "default",
-        "targets": "AQARA_D1_ALT.bin"
+        "configurePreset": "ubuntu",
+        "targets": "FIRMWARE.bin"
+      },
+      {
+        "name": "windows",
+        "configuration": "Release",
+        "configurePreset": "windows",
+        "targets": "FIRMWARE.bin"
       }
     ]
   }

@@ -1,9 +1,0 @@
-{
-    "cmake.useCMakePresets": "always",
-    "cmake.automaticReconfigure": false,
-    "cmake.buildBeforeRun": false,
-    "cmake.configureOnEdit": false,
-    "cmake.exportCompileCommandsFile": false,
-    "cmake.generator": "MinGW Makefiles",
-    "cmake.configureOnOpen": true
-}

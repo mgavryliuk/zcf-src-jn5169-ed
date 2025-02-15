@@ -1,8 +1,7 @@
 build
 toolchain/**
-Build-make
-.cproject
-.project
-.DS_Store
-
+!toolchain/CMakeToolchain.cmake
 !.keep
+!sdk/**
+
+.DS_Store
