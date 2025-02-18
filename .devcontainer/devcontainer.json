@@ -1,0 +1,25 @@
+{
+    "name": "Ubuntu Docker Image",
+    "build": {
+        "context": "..",
+        "dockerfile": "../ubuntu-cmake.Dockerfile",
+        "options": [
+            "--platform=linux/amd64"
+        ]
+    },
+    "containerEnv": {
+        "WORKSPACE": "${containerWorkspaceFolder}"
+    },
+    "runArgs": [
+        "--platform=linux/amd64"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "twxs.cmake"
+            ]
+        }
+    },
+    "onCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/scripts/download_toolchain.sh"
+}
