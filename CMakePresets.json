@@ -32,13 +32,13 @@
         "name": "ubuntu",
         "configuration": "Release",
         "configurePreset": "ubuntu",
-        "targets": "FIRMWARE.bin"
+        "targets": "WXKG07LM_ALT.bin"
       },
       {
         "name": "windows",
         "configuration": "Release",
         "configurePreset": "windows",
-        "targets": "FIRMWARE.bin"
+        "targets": "WXKG07LM_ALT.bin"
       }
     ]
   }

@@ -1,5 +1,6 @@
-set(APP_TARGET FIRMWARE)
+set(APP_TARGET WXKG07LM_ALT)
 set(SDK_TARGET SDK)
+set(VENV_DIR $ENV{VENV_DIR})
 
 set(JENNIC_CHIP JN5169)
 set(JENNIC_CHIP_FAMILY JN516x)
@@ -26,7 +27,10 @@ set(SDK_PREFIX ${CMAKE_SOURCE_DIR}/sdk)
 set(SDK_COMPONENTS_BASE_DIR ${SDK_PREFIX}/Components)
 
 file(GLOB SDK_INCLUDE_FOLDERS "${SDK_COMPONENTS_BASE_DIR}/**/Include")
-include_directories(${SDK_INCLUDE_FOLDERS})
+include_directories(
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${SDK_INCLUDE_FOLDERS}
+)
 
 link_directories(
     ${SDK_COMPONENTS_BASE_DIR}/Library
@@ -34,6 +38,35 @@ link_directories(
 )
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T${SDK_PREFIX}/Chip/${JENNIC_CHIP}/Build/AppBuildZBPro.ld")
+
+set(ZPS_CONFIG "${SDK_PREFIX}/Tools/ZPSConfig/ZPSConfig.py")
+set(PDUM_CONFIG "${SDK_PREFIX}/Tools/PDUMConfig/PDUMConfig.py")
+set(ZPSCFG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/app.zpscfg")
+add_custom_command(
+    OUTPUT
+        zps_gen.c
+        zps_gen.h
+    COMMAND uv run --directory ${VENV_DIR}
+             ${ZPS_CONFIG}
+            -n ${APP_TARGET}
+            -f ${ZPSCFG_FILE}
+            -o ${CMAKE_CURRENT_BINARY_DIR}
+            -t ${JENNIC_CHIP}
+            -l ${SDK_PREFIX}/Components/Library/libZPSNWK_ZED_${JENNIC_CHIP_FAMILY}.a
+            -a ${SDK_PREFIX}/Components/Library/libZPSAPL_${JENNIC_CHIP_FAMILY}.a
+            -c ${TOOLCHAIN_ABS_PATH}
+)
+add_custom_command(
+    OUTPUT
+        pdum_gen.c
+        pdum_gen.h
+        pdum_apdu.S
+    COMMAND uv run --directory ${VENV_DIR}
+            ${PDUM_CONFIG}
+            -z ${APP_TARGET}
+            -f ${ZPSCFG_FILE}
+            -o ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 # ============= START - SDK library ============= 
 set(SDK_SRC
@@ -67,6 +100,10 @@ set(LDLIBS
 # ============= START - Firmware ============= 
 set(APP_SRC
     main.c
+
+    zps_gen.c
+    pdum_gen.c
+    pdum_apdu.S
 )
 add_executable(${APP_TARGET} ${APP_SRC})
 

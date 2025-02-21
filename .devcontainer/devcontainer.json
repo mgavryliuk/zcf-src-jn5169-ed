@@ -17,9 +17,15 @@
         "vscode": {
             "extensions": [
                 "ms-vscode.cmake-tools",
-                "twxs.cmake"
+                "twxs.cmake",
+                "ms-azuretools.vscode-docker",
+                "ms-python.debugpy",
+                "ms-python.python"
             ]
         }
     },
-    "onCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/scripts/download_toolchain.sh"
+    "onCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/scripts/download_toolchain.sh",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    }
 }
