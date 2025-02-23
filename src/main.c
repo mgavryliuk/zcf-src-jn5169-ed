@@ -1,75 +1,134 @@
 #include <jendefs.h>
-
-
 #include "dbg.h"
 #include "dbg_uart.h"
 #include "string.h"
-#include "MicroSpecific.h"
+#include "portmacro.h"
+#include "pwrm.h"
+#include "ZQueue.h"
+#include "ZTimer.h"
+#include "app_main.h"
+#define APP_BUTTON_DIO 1
+#define APP_BUTTONS_DIO_MASK (1 << APP_BUTTON_DIO)
 
+PRIVATE uint8 keepAliveTime = 10;
+PRIVATE pwrm_tsWakeTimerEvent wakeStruct;
 
-#define BOARD_LED_BIT           (17)
-#define BOARD_LED_PIN           (1UL << BOARD_LED_BIT)
-#define BOARD_LED_CTRL_MASK     (BOARD_LED_PIN)
-#define NVIC_INT_PRIO_LEVEL_SYSCTRL (1)
-#define NVIC_INT_PRIO_LEVEL_BBC     (7)
+PRIVATE void vSetUpWakeUpConditions();
+PUBLIC void wakeCallBack(void);
+static PWRM_DECLARE_CALLBACK_DESCRIPTOR(PreSleep);
+static PWRM_DECLARE_CALLBACK_DESCRIPTOR(Wakeup);
 
-extern void *_stack_low_water_mark;
-
-void vAppRegisterPWRMCallbacks(void)
-{
+void vAppRegisterPWRMCallbacks(void){
+    PWRM_vRegisterPreSleepCallback(PreSleep);
+    PWRM_vRegisterWakeupCallback(Wakeup);
 }
 
-PUBLIC void vISR_SystemController(uint32 u32Device, uint32 u32ItemBitmap)
+PUBLIC void APP_vScheduleActivity(void) {
+    uint8 u8Status;
+    u8Status = PWRM_eScheduleActivity(&wakeStruct, keepAliveTime * 32000, wakeCallBack);
+    switch (u8Status)
+    {
+    case PWRM_E_OK:
+        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - PWRM_E_OK\n");
+        break;
+    
+    case PWRM_E_TIMER_RUNNING:
+        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - PWRM_E_TIMER_RUNNING\n");
+        break;
+    
+    case PWRM_E_TIMER_INVALID:
+        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - PWRM_E_TIMER_INVALID\n");
+        break;
+    
+    default:
+        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - impossible\n");
+        break;
+    }
+}
+
+PUBLIC void vISR_SystemController(void)
 {
-    DBG_vPrintf(TRUE, "In vISR_SystemController\n");
+    uint8 u8WakeInt = u8AHI_WakeTimerFiredStatus();
+
+    if(u32AHI_DioWakeStatus() & APP_BUTTONS_DIO_MASK)
+    {
+        DBG_vPrintf(TRUE, "Button interrupt\n");
+        vAHI_DioInterruptEnable(0, APP_BUTTONS_DIO_MASK);
+    }
+
+    if(u8WakeInt & E_AHI_WAKE_TIMER_MASK_1)
+    {
+        /* wake timer interrupt got us here */
+        DBG_vPrintf(TRUE, "APP: Wake Timer 1 Interrupt\n");
+
+        PWRM_vWakeInterruptCallback();
+        APP_vScheduleActivity();
+    }
+}
+
+PUBLIC void waitForXTAL(void) {
+    while (bAHI_GetClkSource() == TRUE);
+    bAHI_SetClockRate(3);
+}
+
+PUBLIC void APP_vSetUpHardware(void)
+{
+    TARGET_INITIALISE();
+    SET_IPL(0);
+    portENABLE_INTERRUPTS();
 }
 
 PUBLIC void vAppMain(void)
 {
-    // TARGET_INITIALISE();
-    // SET_IPL(0);
-    // portENABLE_INTERRUPTS();
-
-    
-    int i;
-    int iteration = 0;
-
-    /* Wait until FALSE i.e. on XTAL  - otherwise uart data will be at wrong speed */
-    while (bAHI_GetClkSource() == TRUE);
-    bAHI_SetClockRate(3); /* Move CPU to 32 MHz  vAHI_OptimiseWaitStates automatically called */
-    
-    /*
-     * Initialize the debug diagnostics module to use UART0 at 115K Baud;
-     * Do not use UART 1 if LEDs are used, as it shares DIO with the LEDS
-     * */
+    waitForXTAL();
     DBG_vUartInit(DBG_E_UART_0, DBG_E_UART_BAUD_RATE_115200);
+    APP_vSetUpHardware();
+    APP_vInitResources();
+    APP_vInitialise();
 
-    /*
-     * Initialise the stack overflow exception to trigger if the end of the
-     * stack is reached. See the linker command file to adjust the allocated
-     * stack size.
-     */
+    // Do this only on specific button click
+    BDB_eNsStartNwkSteering();
 
-    vAHI_SysCtrlRegisterCallback ( vISR_SystemController );
-    u32AHI_Init();
-    vAHI_InterruptSetPriority ( MICRO_ISR_MASK_BBC,        NVIC_INT_PRIO_LEVEL_BBC );
-    vAHI_InterruptSetPriority ( MICRO_ISR_MASK_SYSCTRL, NVIC_INT_PRIO_LEVEL_SYSCTRL );
-    
-    // Initialize hardware
-    vAHI_DioSetDirection(0, BOARD_LED_CTRL_MASK);
+    BDB_vStart();
+    APP_vScheduleActivity();
+    APP_vMainLoop();
+}
 
-    while (1)
-    {
-        DBG_vPrintf(TRUE, "Blink iteration %d\n", iteration++);
-        
-        vAHI_DioSetOutput(0, BOARD_LED_PIN);
-        
-        for (i = 0; i < 1000000; i++)
-            vAHI_DioSetOutput(0, BOARD_LED_PIN);
+PUBLIC void wakeCallBack(void)
+{
+    DBG_vPrintf(TRUE, "\nwakeCallBack()\n");
+}
 
-        vAHI_DioSetOutput(BOARD_LED_PIN, 0);
-        
-        for (i = 0; i < 1000000; i++)
-            vAHI_DioSetOutput(BOARD_LED_PIN, 0);
-    }
+PRIVATE void vSetUpWakeUpConditions()
+{
+    u32AHI_DioWakeStatus();
+    vAHI_DioSetDirection(APP_BUTTONS_DIO_MASK, 0);
+    DBG_vPrintf(TRUE, "Going to sleep: Buttons:%08x Mask:%08x\n", u32AHI_DioReadInput() & APP_BUTTONS_DIO_MASK, APP_BUTTONS_DIO_MASK);
+    vAHI_DioWakeEdge(0, APP_BUTTONS_DIO_MASK);
+    vAHI_DioWakeEnable(APP_BUTTONS_DIO_MASK, 0);
+}
+
+PWRM_CALLBACK(PreSleep)
+{
+    DBG_vPrintf(TRUE, "\nPreSleep\n");
+    vAppApiSaveMacSettings();
+    DBG_vPrintf(TRUE, "PreSleep: 2\n");
+    ZTIMER_vSleep();
+    /* Set up wake up dio input */
+    vSetUpWakeUpConditions();
+    DBG_vUartFlush();
+    vAHI_UartDisable(E_AHI_UART_0);
+}
+
+PWRM_CALLBACK(Wakeup)
+{
+    waitForXTAL();
+    DBG_vUartInit(DBG_E_UART_0, DBG_E_UART_BAUD_RATE_115200);
+    DBG_vPrintf(TRUE, "\nWakeup\n");
+    vMAC_RestoreSettings();
+    DBG_vPrintf(TRUE, "Wakeup: 2\n");
+    APP_vSetUpHardware();
+    ZTIMER_vWake();
+    /* Activate the SleepTask, that would start the SW timer and polling would continue * */
+    // APP_vStartUpHW();
 }

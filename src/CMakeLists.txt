@@ -21,13 +21,45 @@ add_compile_definitions(
     -DPDM_NO_RTOS
     -DJENNIC_MAC_MiniMacShim
     -DJENNIC_STACK_ZBPro
+    -DBDB_SUPPORT_NWK_STEERING
 )
 
-set(SDK_PREFIX ${CMAKE_SOURCE_DIR}/sdk)
+set(SDK_PREFIX ${PROJECT_SOURCE_DIR}/sdk)
 set(SDK_COMPONENTS_BASE_DIR ${SDK_PREFIX}/Components)
 
-file(GLOB SDK_INCLUDE_FOLDERS "${SDK_COMPONENTS_BASE_DIR}/**/Include")
+set(SDK_INCLUDE_FOLDERS
+    ${SDK_COMPONENTS_BASE_DIR}/Aes/Include
+    ${SDK_COMPONENTS_BASE_DIR}/AES_SW/Include
+    ${SDK_COMPONENTS_BASE_DIR}/Common/Include
+    ${SDK_COMPONENTS_BASE_DIR}/DBG/Include
+    ${SDK_COMPONENTS_BASE_DIR}/AppApi/Include
+    ${SDK_COMPONENTS_BASE_DIR}/MAC/Include
+    ${SDK_COMPONENTS_BASE_DIR}/MiniMac/Include
+    ${SDK_COMPONENTS_BASE_DIR}/MMac/Include
+    ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Include
+    ${SDK_COMPONENTS_BASE_DIR}/MicroSpecific/Include
+    ${SDK_COMPONENTS_BASE_DIR}/ZPSAPL/Include
+    ${SDK_COMPONENTS_BASE_DIR}/ZPSNWK/Include
+    ${SDK_COMPONENTS_BASE_DIR}/ZPSMAC/Include
+    ${SDK_COMPONENTS_BASE_DIR}/ZPSTSV/Include
+    ${SDK_COMPONENTS_BASE_DIR}/PDUM/Include
+    ${SDK_COMPONENTS_BASE_DIR}/PDM/Include
+    ${SDK_COMPONENTS_BASE_DIR}/PWRM/Include
+    ${SDK_COMPONENTS_BASE_DIR}/HardwareAPI/Include
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Include
+    ${SDK_COMPONENTS_BASE_DIR}/TimerServer/Include
+    ${SDK_COMPONENTS_BASE_DIR}/BDB/Include
+    ${SDK_COMPONENTS_BASE_DIR}/Random/Include
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Include
+
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source
+    ${SDK_COMPONENTS_BASE_DIR}/BDB/Source/Common
+    ${SDK_COMPONENTS_BASE_DIR}/BDB/Source/NwkSteering
+)
+
 include_directories(
+    ${PROJECT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
     ${SDK_INCLUDE_FOLDERS}
 )
@@ -52,7 +84,7 @@ add_custom_command(
             -f ${ZPSCFG_FILE}
             -o ${CMAKE_CURRENT_BINARY_DIR}
             -t ${JENNIC_CHIP}
-            -l ${SDK_PREFIX}/Components/Library/libZPSNWK_ZED_${JENNIC_CHIP_FAMILY}.a
+            -l ${SDK_PREFIX}/Components/Library/libZPSNWK_${JENNIC_CHIP_FAMILY}.a
             -a ${SDK_PREFIX}/Components/Library/libZPSAPL_${JENNIC_CHIP_FAMILY}.a
             -c ${TOOLCHAIN_ABS_PATH}
 )
@@ -70,10 +102,51 @@ add_custom_command(
 
 # ============= START - SDK library ============= 
 set(SDK_SRC
+    ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/app_zps_link_keys.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/appZpsBeaconHandler.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/appZdpExtraction.c
     ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/ZQueue.c
     ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/ZTimer.c
-    ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/app_zps_link_keys.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/portasm_${JENNIC_CHIP_FAMILY}.S
+    ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/port_${JENNIC_CHIP_FAMILY}.c
+
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/dlist.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_attribute.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_buffer.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_command.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_common.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_CustomCommandReceive.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_CustomCommandSend.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_defaultResponse.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_event.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_heap.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_library_options.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_PDUbufferReadWrite.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_PDUbufferReadWriteString.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_reportManager.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_search.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_timer.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_transmit.c
+    
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/Basic.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/BasicCommandHandler.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/Groups.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/Identify.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/IdentifyCommandHandler.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/IdentifyServerCommands.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/PowerConfiguration.c
+
+    ${SDK_COMPONENTS_BASE_DIR}/BDB/Source/Common/bdb_fr.c
+    ${SDK_COMPONENTS_BASE_DIR}/BDB/Source/Common/bdb_start.c
+    ${SDK_COMPONENTS_BASE_DIR}/BDB/Source/Common/bdb_state_machine.c
+    ${SDK_COMPONENTS_BASE_DIR}/BDB/Source/NwkSteering/bdb_ns.c
+
+    pdum_gen.h
 )
+
+message(STATUS "${SDK_SRC}")
+
 add_library(${SDK_TARGET} STATIC ${SDK_SRC})
 
 set(LDLIBS
@@ -85,20 +158,27 @@ set(LDLIBS
     HardwareApi_${JENNIC_CHIP}
     MicroSpecific_${JENNIC_CHIP_FAMILY}
     Boot_${JENNIC_CHIP_FAMILY}
+    ZPSMAC_Mini_SOC_${JENNIC_CHIP_FAMILY}
     PWRM_${JENNIC_CHIP_FAMILY}
     ZPSTSV_${JENNIC_CHIP_FAMILY}
     AES_SW_${JENNIC_CHIP_FAMILY}
     PDUM_${JENNIC_CHIP_FAMILY}
     ZPSAPL_${JENNIC_CHIP_FAMILY}
+    ZPSAPL_ZCP-GU_${JENNIC_CHIP_FAMILY}
     Random_${JENNIC_CHIP_FAMILY}
     PDM_EEPROM_NO_RTOS_${JENNIC_CHIP_FAMILY}
-    ZPSNWK_ZED_${JENNIC_CHIP_FAMILY}
+    ZPSNWK_${JENNIC_CHIP_FAMILY}
     DBG_${JENNIC_CHIP_FAMILY}
 )
 # ============= END - SDK library ============= 
 
 # ============= START - Firmware ============= 
 set(APP_SRC
+    irq_JN516x.S
+
+    app_main.c
+    app_node.c
+    app_basic_endpoint.c
     main.c
 
     zps_gen.c
