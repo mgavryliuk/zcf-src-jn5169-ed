@@ -20,7 +20,8 @@
                 "twxs.cmake",
                 "ms-azuretools.vscode-docker",
                 "ms-python.debugpy",
-                "ms-python.python"
+                "ms-python.python",
+                "vscode.markdown-language-features"
             ]
         }
     },
