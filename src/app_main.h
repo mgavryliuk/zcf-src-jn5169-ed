@@ -1,5 +1,5 @@
-#ifndef APP_MAIN
-#define APP_MAIN
+#ifndef APP_MAIN_H
+#define APP_MAIN_H
 
 #include "bdb_api.h"
 
@@ -21,4 +21,6 @@ extern PUBLIC tszQueue zps_TimeEvents;
 
 extern PUBLIC tszQueue APP_msgBdbEvents;
 
-#endif /* APP_MAIN */
+extern PUBLIC uint8 u8LedBlinkTimer;
+
+#endif /* APP_MAIN_H */

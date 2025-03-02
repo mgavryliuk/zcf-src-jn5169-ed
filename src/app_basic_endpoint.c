@@ -42,17 +42,17 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
         DBG_vPrintf(TRUE, "Error: eCLD_IdentifyCreateIdentify:%d\r\n", eZCL_Status);
     }
 
-    // eZCL_Status = eCLD_PowerConfigurationCreatePowerConfiguration(
-    //     &tsBasicEndpoint.sClusterInstance.sPowerConfigurationServer,
-    //     TRUE,
-    //     &sCLD_PowerConfiguration,
-    //     &tsBasicEndpoint.sPowerConfigurationCluster,
-    //     &au8BasicClusterAttributeControlBits[0]
-    // );
-    // if (eZCL_Status != E_ZCL_SUCCESS)
-    // {
-    //     DBG_vPrintf(TRUE, "Error: eCLD_PowerConfigurationCreatePowerConfiguration:%d\r\n", eZCL_Status);
-    // }
+    eZCL_Status = eCLD_PowerConfigurationCreatePowerConfiguration(
+        &tsBasicEndpoint.sClusterInstance.sPowerConfigurationServer,
+        TRUE,
+        &sCLD_PowerConfiguration,
+        &tsBasicEndpoint.sPowerConfigurationCluster,
+        &au8BasicClusterAttributeControlBits[0]
+    );
+    if (eZCL_Status != E_ZCL_SUCCESS)
+    {
+        DBG_vPrintf(TRUE, "Error: eCLD_PowerConfigurationCreatePowerConfiguration:%d\r\n", eZCL_Status);
+    }
 
     tsBasicEndpoint.sEndPoint.u8EndPointNumber = WXKG07LM_ALT_BASIC_ENDPOINT;
     tsBasicEndpoint.sEndPoint.u16ManufacturerCode = ZCL_MANUFACTURER_CODE;

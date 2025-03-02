@@ -24,6 +24,7 @@ add_compile_definitions(
     -DBDB_SUPPORT_NWK_STEERING
 
     # -DDEBUG_BDB
+    -DDEBUG_APP
 )
 
 set(SDK_PREFIX ${PROJECT_SOURCE_DIR}/sdk)
@@ -187,6 +188,8 @@ set(APP_SRC
     app_main.c
     app_node.c
     app_basic_endpoint.c
+    app_buttons.c
+    app_led.c
     app_on_off_endpoint.c
     main.c
 
