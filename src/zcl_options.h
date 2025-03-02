@@ -18,7 +18,7 @@
 #define ZCL_MANUFACTURER_CODE                                0x1037
 
 /* Sets the number of endpoints that will be created by the ZCL library */
-#define ZCL_NUMBER_OF_ENDPOINTS                             3
+#define ZCL_NUMBER_OF_ENDPOINTS                             4
 
 /* Set this Tue to disable non error default responses from clusters */
 #define ZCL_DISABLE_DEFAULT_RESPONSES       (TRUE)

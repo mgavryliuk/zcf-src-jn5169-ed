@@ -4,6 +4,7 @@
 #include "string.h"
 #include "portmacro.h"
 #include "pwrm.h"
+#include "PDM.h"
 #include "ZQueue.h"
 #include "ZTimer.h"
 #include "app_main.h"
@@ -26,24 +27,7 @@ void vAppRegisterPWRMCallbacks(void){
 PUBLIC void APP_vScheduleActivity(void) {
     uint8 u8Status;
     u8Status = PWRM_eScheduleActivity(&wakeStruct, keepAliveTime * 32000, wakeCallBack);
-    switch (u8Status)
-    {
-    case PWRM_E_OK:
-        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - PWRM_E_OK\n");
-        break;
-    
-    case PWRM_E_TIMER_RUNNING:
-        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - PWRM_E_TIMER_RUNNING\n");
-        break;
-    
-    case PWRM_E_TIMER_INVALID:
-        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - PWRM_E_TIMER_INVALID\n");
-        break;
-    
-    default:
-        DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - impossible\n");
-        break;
-    }
+    DBG_vPrintf(TRUE, "PWRM_eScheduleActivity - %d\n", u8Status);
 }
 
 PUBLIC void vISR_SystemController(void)
@@ -85,12 +69,10 @@ PUBLIC void vAppMain(void)
     APP_vSetUpHardware();
     APP_vInitResources();
     APP_vInitialise();
-
-    // Do this only on specific button click
-    BDB_eNsStartNwkSteering();
-
     BDB_vStart();
-    APP_vScheduleActivity();
+    // Do this only on specific button click
+    // BDB_eNsStartNwkSteering();
+    // APP_vScheduleActivity();
     APP_vMainLoop();
 }
 

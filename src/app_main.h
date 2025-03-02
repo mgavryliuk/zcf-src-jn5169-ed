@@ -3,7 +3,7 @@
 
 #include "bdb_api.h"
 
-#define APP_ZTIMER_STORAGE          0
+#define APP_ZTIMER_STORAGE          3
 #define BDB_QUEUE_SIZE              3
 #define TIMER_QUEUE_SIZE            8
 #define MLME_QUEQUE_SIZE            8

@@ -22,6 +22,8 @@ add_compile_definitions(
     -DJENNIC_MAC_MiniMacShim
     -DJENNIC_STACK_ZBPro
     -DBDB_SUPPORT_NWK_STEERING
+
+    # -DDEBUG_BDB
 )
 
 set(SDK_PREFIX ${PROJECT_SOURCE_DIR}/sdk)
@@ -124,6 +126,9 @@ set(SDK_SRC
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_library_options.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_PDUbufferReadWrite.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_PDUbufferReadWriteString.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_readAttributesRequestHandle.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_readAttributesResponseHandle.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_WriteAttributesRequestHandle.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_reportManager.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_search.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_timer.c
@@ -135,6 +140,9 @@ set(SDK_SRC
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/Identify.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/IdentifyCommandHandler.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/IdentifyServerCommands.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/OnOff.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/OnOffCommandHandler.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/MultiStateInputBasic.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/PowerConfiguration.c
 
     ${SDK_COMPONENTS_BASE_DIR}/BDB/Source/Common/bdb_fr.c
@@ -179,6 +187,7 @@ set(APP_SRC
     app_main.c
     app_node.c
     app_basic_endpoint.c
+    app_on_off_endpoint.c
     main.c
 
     zps_gen.c

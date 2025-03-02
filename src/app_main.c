@@ -13,6 +13,9 @@
 #include "app_main.h"
 #include "app_node.h"
 
+extern void zps_taskZPS(void);
+PRIVATE void APP_taskEndDevice(void);
+
 PUBLIC tszQueue APP_msgBdbEvents;
 
 PRIVATE ZTIMER_tsTimer asTimers[APP_ZTIMER_STORAGE + BDB_ZTIMER_STORAGE];
@@ -22,9 +25,6 @@ PRIVATE MAC_tsMcpsVsDcfmInd asMacMcpsDcfmInd[MCPS_QUEUE_SIZE];
 PRIVATE MAC_tsMlmeVsDcfmInd asMacMlmeVsDcfmInd[MLME_QUEQUE_SIZE];
 PRIVATE MAC_tsMcpsVsCfmData asMacMcpsDcfm[MCPS_DCFM_QUEUE_SIZE];
 PRIVATE zps_tsTimeEvent     asTimeEvent[TIMER_QUEUE_SIZE];
-
-extern void zps_taskZPS(void);
-extern void PWRM_vManagePower(void);
 
 PUBLIC void APP_vInitResources(void) 
 {
@@ -58,9 +58,13 @@ PUBLIC void APP_vMainLoop(void)
         zps_taskZPS();
         bdb_taskBDB();
         ZTIMER_vTask();
-        // APP_taskEndDevice();
+        APP_taskEndDevice();
 
         vAHI_WatchdogRestart();
         PWRM_vManagePower();
     }
+}
+
+PRIVATE void APP_taskEndDevice(void) {
+
 }

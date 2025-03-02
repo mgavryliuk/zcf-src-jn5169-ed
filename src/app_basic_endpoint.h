@@ -5,7 +5,6 @@
 #include "Basic.h"
 #include "Identify.h"
 #include "PowerConfiguration.h"
-#include "Groups.h"
 
 typedef struct 
 {

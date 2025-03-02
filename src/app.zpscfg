@@ -272,7 +272,7 @@
     <PDUConfiguration NumNPDUs="25" PDUMMutexName="mutexPDUM">
       <APDUs Id="Coordinator->apduZDP" Name="apduZDP" Size="100" Instances="4"/>
     </PDUConfiguration>
-    <ChannelMask Channel11="false" Channel12="false" Channel13="false" Channel14="false" Channel15="true" Channel16="false" Channel17="false" Channel18="false" Channel19="false" Channel20="false" Channel21="false" Channel22="false" Channel23="false" Channel24="false" Channel25="false" Channel26="false"/>
+    <ChannelMask Channel11="true" Channel12="false" Channel13="false" Channel14="false" Channel15="true" Channel16="false" Channel17="false" Channel18="false" Channel19="false" Channel20="true" Channel21="false" Channel22="false" Channel23="false" Channel24="false" Channel25="true" Channel26="false"/>
     <NodeDescriptor ManufacturerCode="0" LogicalType="ZC" ComplexDescriptorAvailable="false" UserDescriptorAvailable="false" APSFlags="0" FrequencyBand="2.4GHz" AlternatePANCoordinator="true" DeviceType="true" PowerSource="true" RxOnWhenIdle="true" Security="false" AllocateAddress="true" MaximumBufferSize="127" MaximumIncomingTransferSize="0" MaximumOutgoingTransferSize="0" ExtendedActiveEndpointListAvailable="false" ExtendedSimpleDescriptorListAvailable="false" PrimaryTrustCenter="true" BackupTrustCenter="false" PrimaryBindingTableCache="false" BackupBindingTableCache="false" PrimaryDiscoveryCache="false" BackupDiscoveryCache="false" NetworkManager="true"/>
     <NodePowerDescriptor ConstantPower="true" RechargeableBattery="false" DisposableBattery="false" DefaultPowerSource="Constant Power" DefaultPowerMode="Synchronised with RxOnWhenIdle"/>
     <BindingTable Size="16"/>
@@ -280,7 +280,7 @@
       <MacInterface RouterAllowed="true" ChannelListSize="1" index="0" RadioType="RT2400MHz" Enabled="true"/>
     </MacInterfaceList>
     <TrustCenter>
-      <Keys xsi:type="zpscfg:DefaultNwkKey" KeySequenceNumber="1" Key="0x00000000000000000000000000000000" Id="Coordinator->DefaultNwkKey" Random="true"/>
+      <Keys xsi:type="zpscfg:PreconfiguredTCLinkKey" Id="Coordinator->PreconfiguredTCLinkKey"/>
     </TrustCenter>
     <ZDOServers>
       <DefaultServer OutputAPdu="Coordinator->apduZDP"/>
@@ -491,10 +491,10 @@
       <OutputClusters Cluster="OnOff" TxAPDUs="WXKG07LM_ALT->apduZCL" Discoverable="true"/>
     </Endpoints>
     <PDUConfiguration NumNPDUs="25" PDUMMutexName="mutexPDUM">
-      <APDUs Id="WXKG07LM_ALT->apduZDP" Name="apduZDP" Size="100" Instances="4"/>
-      <APDUs Id="WXKG07LM_ALT->apduZCL" Name="apduZCL" Size="1" Instances="1"/>
+      <APDUs Id="WXKG07LM_ALT->apduZDP" Name="apduZDP" Size="100" Instances="16"/>
+      <APDUs Id="WXKG07LM_ALT->apduZCL" Name="apduZCL" Size="100" Instances="15"/>
     </PDUConfiguration>
-    <ChannelMask Channel11="true" Channel12="true" Channel13="true" Channel14="true" Channel15="true" Channel16="true" Channel17="true" Channel18="true" Channel19="true" Channel20="true" Channel21="true" Channel22="true" Channel23="true" Channel24="true" Channel25="true" Channel26="true"/>
+    <ChannelMask Channel11="true" Channel12="false" Channel13="false" Channel14="false" Channel15="true" Channel16="false" Channel17="false" Channel18="false" Channel19="false" Channel20="true" Channel21="false" Channel22="false" Channel23="false" Channel24="false" Channel25="true" Channel26="false"/>
     <NodeDescriptor ManufacturerCode="4151" LogicalType="ZED" ComplexDescriptorAvailable="false" UserDescriptorAvailable="false" APSFlags="0" FrequencyBand="2.4GHz" AlternatePANCoordinator="false" DeviceType="false" PowerSource="false" RxOnWhenIdle="false" Security="false" AllocateAddress="true" MaximumBufferSize="127" MaximumIncomingTransferSize="1" MaximumOutgoingTransferSize="1" ExtendedActiveEndpointListAvailable="false" ExtendedSimpleDescriptorListAvailable="false" PrimaryTrustCenter="false" BackupTrustCenter="false" PrimaryBindingTableCache="false" BackupBindingTableCache="false" PrimaryDiscoveryCache="false" BackupDiscoveryCache="false" NetworkManager="false"/>
     <NodePowerDescriptor ConstantPower="false" RechargeableBattery="false" DisposableBattery="true" DefaultPowerSource="Disposable Battery" DefaultPowerMode="Synchronised with RxOnWhenIdle"/>
     <BindingTable Size="16"/>
