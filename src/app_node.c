@@ -25,8 +25,7 @@ PRIVATE void APP_ZCL_cbGeneralCallback(tsZCL_CallBackEvent *psEvent) {}
 PUBLIC void APP_vInitialiseNode(void)
 {
     uint16 u16ByteRead;
-    eNodeState = E_STARTUP;
-    PDM_eSaveRecordData(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState));
+    eNodeState = E_NO_LINK;
     PDM_eReadDataFromRecord(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState), &u16ByteRead);
     ZPS_eAplAfInit();
     APP_ZCL_vInitialise();
@@ -64,13 +63,12 @@ PUBLIC void APP_vBdbCallback(BDB_tsBdbEvent *psBdbEvent)
 
         case BDB_EVENT_REJOIN_FAILURE:
             DBG_vPrintf(TRUE,"APP: BDB_EVENT_REJOIN_FAILURE\n");
-            // bBDBJoinFailed = TRUE;
+            eNodeState = E_REJOIN_FAILED;
             break;
 
         case BDB_EVENT_REJOIN_SUCCESS:
-            eNodeState = E_RUNNING;
+            eNodeState = E_CONNECTED;
             // vStartPolling();
-            // bBDBJoinFailed = FALSE;
             DBG_vPrintf(TRUE,"APP: BDB_EVENT_REJOIN_SUCCESS\n");
             break;
 
@@ -100,7 +98,7 @@ PRIVATE void APP_vBdbInit(void)
 {
     BDB_tsInitArgs sInitArgs;
 
-    sBDB.sAttrib.bbdbNodeIsOnANetwork = ((eNodeState >= E_RUNNING)? (TRUE): (FALSE));
+    sBDB.sAttrib.bbdbNodeIsOnANetwork = ((eNodeState >= E_CONNECTED)? (TRUE): (FALSE));
     if(sBDB.sAttrib.bbdbNodeIsOnANetwork)
     {
         DBG_vPrintf(TRUE, "APP: NFN Start\n");
@@ -174,7 +172,7 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
 
             ZPS_eAplAibSetApsUseExtendedPanId(ZPS_u64NwkNibGetEpid(ZPS_pvAplZdoGetNwkHandle()));
 
-            eNodeState = E_RUNNING;
+            eNodeState = E_CONNECTED;
             PDM_eSaveRecordData(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState));
             break;
 
@@ -264,11 +262,10 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
 
 PRIVATE void vAppFactoryResetRecords(void)
 {
-    /* clear out the stack */
     ZPS_vDefaultStack();
     ZPS_eAplAibSetApsUseExtendedPanId(0);
     ZPS_vSetKeys();
-    eNodeState = E_STARTUP;
+    eNodeState = E_NO_LINK;
     PDM_eSaveRecordData(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState));
     ZPS_vSaveAllZpsRecords();
 }

@@ -22,5 +22,6 @@ extern PUBLIC tszQueue zps_TimeEvents;
 extern PUBLIC tszQueue APP_msgBdbEvents;
 
 extern PUBLIC uint8 u8LedBlinkTimer;
+extern PUBLIC uint8 u8TimerButtonScan;
 
 #endif /* APP_MAIN_H */

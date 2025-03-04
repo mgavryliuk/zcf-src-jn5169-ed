@@ -185,13 +185,13 @@ set(LDLIBS
 set(APP_SRC
     irq_JN516x.S
 
+    app_entrypoint.c
     app_main.c
     app_node.c
     app_basic_endpoint.c
-    app_buttons.c
+    app_button.c
     app_led.c
     app_on_off_endpoint.c
-    main.c
 
     zps_gen.c
     pdum_gen.c

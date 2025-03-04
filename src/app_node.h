@@ -7,8 +7,9 @@ PUBLIC void APP_vInitialiseNode(void);
 
 typedef enum
 {
-    E_STARTUP,
-    E_RUNNING
+    E_NO_LINK,
+    E_CONNECTED,
+    E_REJOIN_FAILED
 } teNodeState;
 
 #endif /* APP_NODE_H */

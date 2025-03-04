@@ -5,3 +5,4 @@ toolchain/**
 !sdk/**
 
 .DS_Store
+.vscode

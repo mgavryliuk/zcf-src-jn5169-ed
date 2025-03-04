@@ -5,9 +5,14 @@
 #include "portmacro.h"
 #include "pwrm.h"
 
+#include "app_entrypoint.h"
 #include "app_common.h"
-#include "app_buttons.h"
+#include "app_button.h"
+#include "app_led.h"
 #include "app_main.h"
+
+PRIVATE uint8 keepAlive = 10;
+PRIVATE pwrm_tsWakeTimerEvent wakeStruct;
 
 static PWRM_DECLARE_CALLBACK_DESCRIPTOR(PreSleep);
 static PWRM_DECLARE_CALLBACK_DESCRIPTOR(Wakeup);
@@ -15,6 +20,21 @@ static PWRM_DECLARE_CALLBACK_DESCRIPTOR(Wakeup);
 void vAppRegisterPWRMCallbacks(void){
     PWRM_vRegisterPreSleepCallback(PreSleep);
     PWRM_vRegisterWakeupCallback(Wakeup);
+}
+
+PUBLIC void vISR_SystemController(void)
+{
+    uint8 u8WakeInt = u8AHI_WakeTimerFiredStatus();
+
+    APP_vHandleBtnInterrupts();
+    if(u8WakeInt & E_AHI_WAKE_TIMER_MASK_1)
+    {
+        /* wake timer interrupt got us here */
+        DBG_vPrintf(TRACE_APP, "APP: Wake Timer 1 Interrupt\n");
+        APP_vBlinkLed(BLINK_BOTH, 5);
+        PWRM_vWakeInterruptCallback();
+        APP_vScheduleActivity();
+    }
 }
 
 PUBLIC void waitForXTAL(void) {
@@ -65,4 +85,16 @@ PWRM_CALLBACK(Wakeup)
     ZTIMER_vWake();
     /* Activate the SleepTask, that would start the SW timer and polling would continue * */
     // APP_vStartUpHW();
+}
+
+
+PUBLIC void APP_vScheduleActivity(void) {
+    uint8 u8Status;
+    u8Status = PWRM_eScheduleActivity(&wakeStruct, keepAlive * 1000 * 32, APP_vWakeCallBack);
+    DBG_vPrintf(TRACE_APP, "APP: PWRM_eScheduleActivity status: %d\n", u8Status);
+}
+
+PUBLIC void APP_vWakeCallBack(void)
+{
+    DBG_vPrintf(TRACE_APP, "APP: wake callback triggered\n");
 }

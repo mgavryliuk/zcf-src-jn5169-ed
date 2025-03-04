@@ -11,9 +11,11 @@
 #include "PDM.h"
 #include "bdb_api.h"
 
+#include "app_common.h"
 #include "app_led.h"
 #include "app_main.h"
 #include "app_node.h"
+#include "app_button.h"
 
 extern void zps_taskZPS(void);
 PRIVATE void APP_taskEndDevice(void);
@@ -29,6 +31,7 @@ PRIVATE MAC_tsMcpsVsCfmData asMacMcpsDcfm[MCPS_DCFM_QUEUE_SIZE];
 PRIVATE zps_tsTimeEvent     asTimeEvent[TIMER_QUEUE_SIZE];
 
 PUBLIC uint8 u8LedBlinkTimer;
+PUBLIC uint8 u8TimerButtonScan;
 
 PUBLIC void APP_vInitResources(void) 
 {
@@ -36,6 +39,8 @@ PUBLIC void APP_vInitResources(void)
     ZTIMER_eInit(asTimers, sizeof(asTimers) / sizeof(ZTIMER_tsTimer));
 
     ZTIMER_eOpen(&u8LedBlinkTimer, APP_cbBlinkLed, NULL , ZTIMER_FLAG_PREVENT_SLEEP);
+    ZTIMER_eOpen(&u8TimerButtonScan, APP_cbTimerButtonScan, NULL , ZTIMER_FLAG_PREVENT_SLEEP);
+    // TODO: setup other timers
 
     ZQ_vQueueCreate(&APP_msgBdbEvents,    BDB_QUEUE_SIZE,       sizeof(BDB_tsZpsAfEvent),    (uint8*)asBdbEvent);
     ZQ_vQueueCreate(&zps_msgMlmeDcfmInd,  MLME_QUEQUE_SIZE,     sizeof(MAC_tsMlmeVsDcfmInd), (uint8*)asMacMlmeVsDcfmInd);
@@ -46,13 +51,14 @@ PUBLIC void APP_vInitResources(void)
 
 PRIVATE void vfExtendedStatusCallBack (ZPS_teExtendedStatus eExtendedStatus)
 {
-    DBG_vPrintf(TRUE, "ERROR: Extended status 0x%02x\n", eExtendedStatus);
+    DBG_vPrintf(TRACE_APP, "APP: vfExtendedStatusCallBack - Extended status 0x%02x\n", eExtendedStatus);
 }
 
 PUBLIC void APP_vInitialise(void)
 {
     APP_vSetupLeds();
-    // TODO: init BTN interrupts
+    APP_vConfigureButtons();
+
     PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
     PDM_eInitialise(0);
     PDUM_vInit();
@@ -68,13 +74,11 @@ PUBLIC void APP_vMainLoop(void)
         bdb_taskBDB();
         ZTIMER_vTask();
         APP_taskEndDevice();
-
         vAHI_WatchdogRestart();
-        // PWRM_vInit(E_AHI_SLEEP_DEEP);
         PWRM_vManagePower();
     }
 }
 
 PRIVATE void APP_taskEndDevice(void) {
-
+    // DBG_vPrintf(TRACE_APP, "APP: APP_taskEndDevice\n");
 }

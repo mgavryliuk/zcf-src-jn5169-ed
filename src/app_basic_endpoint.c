@@ -34,7 +34,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
         TRUE,
         &sCLD_Identify,
         &tsBasicEndpoint.sIdentifyServerCluster,
-        &au8BasicClusterAttributeControlBits[0],
+        &au8IdentifyAttributeControlBits[0],
         &tsBasicEndpoint.sIdentifyServerCustomDataStructure
     );
     if (eZCL_Status != E_ZCL_SUCCESS)
@@ -47,7 +47,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
         TRUE,
         &sCLD_PowerConfiguration,
         &tsBasicEndpoint.sPowerConfigurationCluster,
-        &au8BasicClusterAttributeControlBits[0]
+        &au8PowerConfigurationAttributeControlBits[0]
     );
     if (eZCL_Status != E_ZCL_SUCCESS)
     {
