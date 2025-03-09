@@ -6,12 +6,12 @@
 #include "Identify.h"
 #include "PowerConfiguration.h"
 
-typedef struct 
+typedef struct
 {
     tsZCL_ClusterInstance sBasicServer;
     tsZCL_ClusterInstance sIdentifyServer;
     tsZCL_ClusterInstance sPowerConfigurationServer;
-} tsZHA_BasicEndpointClusterInstances __attribute__ ((aligned(4)));
+} tsZHA_BasicEndpointClusterInstances __attribute__((aligned(4)));
 
 typedef struct
 {

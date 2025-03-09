@@ -7,7 +7,6 @@
 /***        Macro Definitions                                             ***/
 /****************************************************************************/
 
-
 /****************************************************************************/
 /*                      ZCL Specific initialization                         */
 /****************************************************************************/
@@ -15,14 +14,14 @@
 /* specific command apply to the Zigbee alliance for an Id for your company */
 /* Also update the manufacturer code in .zpscfg: Node Descriptor->misc      */
 
-#define ZCL_MANUFACTURER_CODE                                0x1037
+#define ZCL_MANUFACTURER_CODE 0x1037
 
 /* Sets the number of endpoints that will be created by the ZCL library */
-#define ZCL_NUMBER_OF_ENDPOINTS                             4
+#define ZCL_NUMBER_OF_ENDPOINTS 4
 
 /* Set this Tue to disable non error default responses from clusters */
-#define ZCL_DISABLE_DEFAULT_RESPONSES       (TRUE)
-#define ZCL_DISABLE_APS_ACK                 (TRUE)
+#define ZCL_DISABLE_DEFAULT_RESPONSES (TRUE)
+#define ZCL_DISABLE_APS_ACK (TRUE)
 
 #define ZCL_ATTRIBUTE_READ_SERVER_SUPPORTED
 #define ZCL_ATTRIBUTE_READ_CLIENT_SUPPORTED
@@ -50,7 +49,7 @@
 
 #define CLD_MULTISTATE_INPUT_BASIC
 #define MULTISTATE_INPUT_BASIC_SERVER
-#define CLD_MULTISTATE_INPUT_BASIC_ATTR_NUMBER_OF_STATES    255
+#define CLD_MULTISTATE_INPUT_BASIC_ATTR_NUMBER_OF_STATES 255
 
 #define CLD_POWER_CONFIGURATION
 #define POWER_CONFIGURATION_SERVER
@@ -61,21 +60,21 @@
 /* Add the following #define's to your zcl_options.h file to add optional   */
 /* attributes to the basic cluster.                                         */
 /****************************************************************************/
-#define   CLD_BAS_ATTR_APPLICATION_VERSION
-#define   CLD_BAS_ATTR_STACK_VERSION
-#define   CLD_BAS_ATTR_HARDWARE_VERSION
-#define   CLD_BAS_ATTR_MANUFACTURER_NAME
-#define   CLD_BAS_ATTR_MODEL_IDENTIFIER
-#define   CLD_BAS_ATTR_DATE_CODE
-#define   CLD_BAS_ATTR_SW_BUILD_ID
+#define CLD_BAS_ATTR_APPLICATION_VERSION
+#define CLD_BAS_ATTR_STACK_VERSION
+#define CLD_BAS_ATTR_HARDWARE_VERSION
+#define CLD_BAS_ATTR_MANUFACTURER_NAME
+#define CLD_BAS_ATTR_MODEL_IDENTIFIER
+#define CLD_BAS_ATTR_DATE_CODE
+#define CLD_BAS_ATTR_SW_BUILD_ID
 
-#define CLD_BAS_APP_VERSION         (1)
-#define CLD_BAS_STACK_VERSION       (1)
-#define CLD_BAS_HARDWARE_VERSION    (1)
-#define CLD_BAS_MANUF_NAME_SIZE     (3)
-#define CLD_BAS_MODEL_ID_SIZE       (13)
-#define CLD_BAS_DATE_SIZE           (8)
-#define CLD_BAS_POWER_SOURCE        E_CLD_BAS_PS_BATTERY
-#define CLD_BAS_SW_BUILD_SIZE       (9)
+#define CLD_BAS_APP_VERSION (1)
+#define CLD_BAS_STACK_VERSION (1)
+#define CLD_BAS_HARDWARE_VERSION (1)
+#define CLD_BAS_MANUF_NAME_SIZE (3)
+#define CLD_BAS_MODEL_ID_SIZE (13)
+#define CLD_BAS_DATE_SIZE (8)
+#define CLD_BAS_POWER_SOURCE E_CLD_BAS_PS_BATTERY
+#define CLD_BAS_SW_BUILD_SIZE (9)
 
 #endif /* ZCL_OPTIONS_H */

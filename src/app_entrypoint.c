@@ -17,7 +17,8 @@ PRIVATE pwrm_tsWakeTimerEvent wakeStruct;
 static PWRM_DECLARE_CALLBACK_DESCRIPTOR(PreSleep);
 static PWRM_DECLARE_CALLBACK_DESCRIPTOR(Wakeup);
 
-void vAppRegisterPWRMCallbacks(void){
+void vAppRegisterPWRMCallbacks(void)
+{
     PWRM_vRegisterPreSleepCallback(PreSleep);
     PWRM_vRegisterWakeupCallback(Wakeup);
 }
@@ -25,9 +26,17 @@ void vAppRegisterPWRMCallbacks(void){
 PUBLIC void vISR_SystemController(void)
 {
     uint8 u8WakeInt = u8AHI_WakeTimerFiredStatus();
+    uint32 u32DioStatus = u32AHI_DioInterruptStatus();
 
-    APP_vHandleBtnInterrupts();
-    if(u8WakeInt & E_AHI_WAKE_TIMER_MASK_1)
+    DBG_vPrintf(TRACE_APP, "APP: vISR_SystemController called. DIO status: %x. WakeTimee status: %x\n", u32DioStatus, u8WakeInt);
+    if (u32DioStatus)
+    {
+        vAHI_DioInterruptEnable(0, APP_BTN_CTRL_MASK);
+        ZTIMER_eStop(u8TimerButtonScan);
+        ZTIMER_eStart(u8TimerButtonScan, APP_BTN_TIMER_MSEC);
+    }
+
+    if (u8WakeInt & E_AHI_WAKE_TIMER_MASK_1)
     {
         /* wake timer interrupt got us here */
         DBG_vPrintf(TRACE_APP, "APP: Wake Timer 1 Interrupt\n");
@@ -37,8 +46,10 @@ PUBLIC void vISR_SystemController(void)
     }
 }
 
-PUBLIC void waitForXTAL(void) {
-    while (bAHI_GetClkSource() == TRUE);
+PUBLIC void waitForXTAL(void)
+{
+    while (bAHI_GetClkSource() == TRUE)
+        ;
     bAHI_SetClockRate(3);
 }
 
@@ -52,16 +63,16 @@ PUBLIC void APP_vSetUpHardware(void)
 PUBLIC void vAppMain(void)
 {
     waitForXTAL();
-    
+
     DBG_vUartInit(DBG_E_UART_0, DBG_E_UART_BAUD_RATE_115200);
-    DBG_vPrintf(TRACE_APP, "vAppMain: Start\n");
+    DBG_vPrintf(TRACE_APP, "\nvAppMain: Start\n");
     APP_vSetUpHardware();
     APP_vInitResources();
     APP_vInitialise();
     BDB_vStart();
     // Do this only on specific button click
     // BDB_eNsStartNwkSteering();
-    APP_vScheduleActivity();
+    // APP_vScheduleActivity();
     DBG_vPrintf(TRACE_APP, "vAppMain: Entering main loop...\n");
     APP_vMainLoop();
 }
@@ -87,8 +98,8 @@ PWRM_CALLBACK(Wakeup)
     // APP_vStartUpHW();
 }
 
-
-PUBLIC void APP_vScheduleActivity(void) {
+PUBLIC void APP_vScheduleActivity(void)
+{
     uint8 u8Status;
     u8Status = PWRM_eScheduleActivity(&wakeStruct, keepAlive * 1000 * 32, APP_vWakeCallBack);
     DBG_vPrintf(TRACE_APP, "APP: PWRM_eScheduleActivity status: %d\n", u8Status);

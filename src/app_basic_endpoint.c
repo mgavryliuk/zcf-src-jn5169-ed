@@ -22,8 +22,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
         TRUE,
         &sCLD_Basic,
         &tsBasicEndpoint.sBasicServerCluster,
-        &au8BasicClusterAttributeControlBits[0]
-    );
+        &au8BasicClusterAttributeControlBits[0]);
     if (eZCL_Status != E_ZCL_SUCCESS)
     {
         DBG_vPrintf(TRUE, "Error: eCLD_BasicCreateBasic:%d\r\n", eZCL_Status);
@@ -35,8 +34,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
         &sCLD_Identify,
         &tsBasicEndpoint.sIdentifyServerCluster,
         &au8IdentifyAttributeControlBits[0],
-        &tsBasicEndpoint.sIdentifyServerCustomDataStructure
-    );
+        &tsBasicEndpoint.sIdentifyServerCustomDataStructure);
     if (eZCL_Status != E_ZCL_SUCCESS)
     {
         DBG_vPrintf(TRUE, "Error: eCLD_IdentifyCreateIdentify:%d\r\n", eZCL_Status);
@@ -47,8 +45,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
         TRUE,
         &sCLD_PowerConfiguration,
         &tsBasicEndpoint.sPowerConfigurationCluster,
-        &au8PowerConfigurationAttributeControlBits[0]
-    );
+        &au8PowerConfigurationAttributeControlBits[0]);
     if (eZCL_Status != E_ZCL_SUCCESS)
     {
         DBG_vPrintf(TRUE, "Error: eCLD_PowerConfigurationCreatePowerConfiguration:%d\r\n", eZCL_Status);
@@ -59,7 +56,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     tsBasicEndpoint.sEndPoint.u16ProfileEnum = HA_PROFILE_ID;
     tsBasicEndpoint.sEndPoint.bIsManufacturerSpecificProfile = FALSE;
     tsBasicEndpoint.sEndPoint.u16NumberOfClusters = sizeof(tsZHA_BasicEndpointClusterInstances) / sizeof(tsZCL_ClusterInstance);
-    tsBasicEndpoint.sEndPoint.psClusterInstance = (tsZCL_ClusterInstance*)&tsBasicEndpoint.sClusterInstance;
+    tsBasicEndpoint.sEndPoint.psClusterInstance = (tsZCL_ClusterInstance *)&tsBasicEndpoint.sClusterInstance;
     tsBasicEndpoint.sEndPoint.bDisableDefaultResponse = ZCL_DISABLE_DEFAULT_RESPONSES;
     tsBasicEndpoint.sEndPoint.pCallBackFunctions = &APP_cbBasicEndpointCallback;
 
@@ -79,33 +76,33 @@ PRIVATE void APP_cbBasicEndpointCallback(tsZCL_CallBackEvent *psEvent)
 {
     switch (psEvent->eEventType)
     {
-        case E_ZCL_CBET_UNHANDLED_EVENT:
-        case E_ZCL_CBET_READ_ATTRIBUTES_RESPONSE:
-        case E_ZCL_CBET_READ_REQUEST:
-        case E_ZCL_CBET_DEFAULT_RESPONSE:
-        case E_ZCL_CBET_ERROR:
-        case E_ZCL_CBET_TIMER:
-        case E_ZCL_CBET_ZIGBEE_EVENT:
-            DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: No action\r\n");
-            break;
+    case E_ZCL_CBET_UNHANDLED_EVENT:
+    case E_ZCL_CBET_READ_ATTRIBUTES_RESPONSE:
+    case E_ZCL_CBET_READ_REQUEST:
+    case E_ZCL_CBET_DEFAULT_RESPONSE:
+    case E_ZCL_CBET_ERROR:
+    case E_ZCL_CBET_TIMER:
+    case E_ZCL_CBET_ZIGBEE_EVENT:
+        DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: No action\r\n");
+        break;
 
-        case E_ZCL_CBET_READ_INDIVIDUAL_ATTRIBUTE_RESPONSE:
-            DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Read Attrib Rsp %d %02x\n", psEvent->uMessage.sIndividualAttributeResponse.eAttributeStatus,
-                *((uint8*)psEvent->uMessage.sIndividualAttributeResponse.pvAttributeData));
-            break;
+    case E_ZCL_CBET_READ_INDIVIDUAL_ATTRIBUTE_RESPONSE:
+        DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Read Attrib Rsp %d %02x\n", psEvent->uMessage.sIndividualAttributeResponse.eAttributeStatus,
+                    *((uint8 *)psEvent->uMessage.sIndividualAttributeResponse.pvAttributeData));
+        break;
 
-        case E_ZCL_CBET_CLUSTER_CUSTOM:
-            DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Custom %04x\r\n", psEvent->uMessage.sClusterCustomMessage.u16ClusterId);
-            // APP_vHandleClusterCustomCommands(psEvent);
-            break;
+    case E_ZCL_CBET_CLUSTER_CUSTOM:
+        DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Custom %04x\r\n", psEvent->uMessage.sClusterCustomMessage.u16ClusterId);
+        // APP_vHandleClusterCustomCommands(psEvent);
+        break;
 
-        case E_ZCL_CBET_CLUSTER_UPDATE:
-            DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Update Id %04x\n", psEvent->psClusterInstance->psClusterDefinition->u16ClusterEnum);
-            // APP_vHandleClusterUpdate(psEvent);
-            break;
+    case E_ZCL_CBET_CLUSTER_UPDATE:
+        DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Update Id %04x\n", psEvent->psClusterInstance->psClusterDefinition->u16ClusterEnum);
+        // APP_vHandleClusterUpdate(psEvent);
+        break;
 
-        default:
-            DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Invalid event type (%d) in APP_ZCL_cbEndpointCallback\r\n", psEvent->eEventType);
-            break;
+    default:
+        DBG_vPrintf(TRUE, "APP_cbBasicEndpointCallback: Invalid event type (%d) in APP_ZCL_cbEndpointCallback\r\n", psEvent->eEventType);
+        break;
     }
 }

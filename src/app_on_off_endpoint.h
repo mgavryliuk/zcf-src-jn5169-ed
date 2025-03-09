@@ -9,7 +9,7 @@ typedef struct
 {
     tsZCL_ClusterInstance sOnOffClient;
     tsZCL_ClusterInstance sMultistateInputServer;
-} tsZHA_OnOffEndpointClusterInstances __attribute__ ((aligned(4)));
+} tsZHA_OnOffEndpointClusterInstances __attribute__((aligned(4)));
 
 typedef struct
 {

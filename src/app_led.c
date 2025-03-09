@@ -17,8 +17,10 @@ PUBLIC void APP_vSetupLeds(void)
     vAHI_DioSetDirection(0, APP_LEDS_CTRL_MASK);
 }
 
-PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount) {
-    if (u8Amount <= 0) {
+PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount)
+{
+    if (u8Amount <= 0)
+    {
         return;
     }
 
@@ -28,11 +30,12 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount) {
     {
     case BLINK_LEFT:
     case BLINK_RIGHT:
-        if (sBlinkConfigs[eBlinkMode].u8Amount == 0) sBlinkConfigs[eBlinkMode].u8Amount = u16CallbackCycles;
+        if (sBlinkConfigs[eBlinkMode].u8Amount == 0)
+            sBlinkConfigs[eBlinkMode].u8Amount = u16CallbackCycles;
         break;
 
     case BLINK_BOTH:
-        // TOOD: think what to do if we are in the middle of the blink
+        vAHI_DioSetOutput(0, APP_LEDS_CTRL_MASK);
         sBlinkConfigs[BLINK_LEFT].u8Amount = u16CallbackCycles;
         sBlinkConfigs[BLINK_RIGHT].u8Amount = u16CallbackCycles;
         break;
@@ -42,7 +45,8 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount) {
     }
 
     ZTIMER_teState eZtimerState = ZTIMER_eGetState(u8LedBlinkTimer);
-    if (eZtimerState == E_ZTIMER_STATE_RUNNING || eZtimerState == E_ZTIMER_STATE_EXPIRED) {
+    if (eZtimerState == E_ZTIMER_STATE_RUNNING || eZtimerState == E_ZTIMER_STATE_EXPIRED)
+    {
         DBG_vPrintf(TRACE_APP, "APP: Blink Led timer is already running\n");
         return;
     }
@@ -51,7 +55,8 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount) {
     uint8 i;
     for (i = 0; i < sizeof(sBlinkConfigs) / sizeof(ts_BlinkConfig); i++)
     {
-        if (sBlinkConfigs[i].u8Amount > 0) {
+        if (sBlinkConfigs[i].u8Amount > 0)
+        {
             bNeedToStart = TRUE;
             break;
         }
@@ -64,25 +69,29 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount) {
     }
 }
 
-PUBLIC void APP_cbBlinkLed(void *pvParam) {
+PUBLIC void APP_cbBlinkLed(void *pvParam)
+{
     DBG_vPrintf(TRACE_APP, "APP: APP_cbBlinkLed - Enter\n");
     uint32 u32ToggleMask = 0;
     bool bNeedAnotherCycle = FALSE;
     uint8 i;
     for (i = 0; i < sizeof(sBlinkConfigs) / sizeof(ts_BlinkConfig); i++)
     {
-        if (sBlinkConfigs[i].u8Amount > 0) {
+        if (sBlinkConfigs[i].u8Amount > 0)
+        {
             u32ToggleMask |= sBlinkConfigs[i].u32Mask;
             sBlinkConfigs[i].u8Amount--;
-            if (sBlinkConfigs[i].u8Amount > 0) {
+            if (sBlinkConfigs[i].u8Amount > 0)
+            {
                 bNeedAnotherCycle = TRUE;
             }
         }
     }
 
-    if (u32ToggleMask > 0) {
+    if (u32ToggleMask > 0)
+    {
         uint32 u32CurrentState = u32AHI_DioReadInput();
-        vAHI_DioSetOutput(u32CurrentState^u32ToggleMask, u32CurrentState&u32ToggleMask);
+        vAHI_DioSetOutput(u32CurrentState ^ u32ToggleMask, u32CurrentState & u32ToggleMask);
     }
 
     switch (bNeedAnotherCycle)
