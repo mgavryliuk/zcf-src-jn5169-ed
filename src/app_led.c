@@ -2,7 +2,6 @@
 #include "dbg.h"
 #include "AppHardwareApi.h"
 
-#include "app_common.h"
 #include "app_led.h"
 #include "app_main.h"
 
@@ -13,7 +12,7 @@ ts_BlinkConfig sBlinkConfigs[] = {
 
 PUBLIC void APP_vSetupLeds(void)
 {
-    DBG_vPrintf(TRACE_APP, "APP: Configure LEDs control MASK: %08x\n", APP_LEDS_CTRL_MASK);
+    DBG_vPrintf(TRACE_LED, "LED: Configure control mask: %08x\n", APP_LEDS_CTRL_MASK);
     vAHI_DioSetDirection(0, APP_LEDS_CTRL_MASK);
 }
 
@@ -30,11 +29,13 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount)
     {
     case BLINK_LEFT:
     case BLINK_RIGHT:
+        DBG_vPrintf(TRACE_LED, "LED: Blink mode: %d. Cycles: %d\n", eBlinkMode, u16CallbackCycles);
         if (sBlinkConfigs[eBlinkMode].u8Amount == 0)
             sBlinkConfigs[eBlinkMode].u8Amount = u16CallbackCycles;
         break;
 
     case BLINK_BOTH:
+        DBG_vPrintf(TRACE_LED, "LED: Blink both. Cycles: %d\n", u16CallbackCycles);
         vAHI_DioSetOutput(0, APP_LEDS_CTRL_MASK);
         sBlinkConfigs[BLINK_LEFT].u8Amount = u16CallbackCycles;
         sBlinkConfigs[BLINK_RIGHT].u8Amount = u16CallbackCycles;
@@ -45,9 +46,9 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount)
     }
 
     ZTIMER_teState eZtimerState = ZTIMER_eGetState(u8LedBlinkTimer);
-    if (eZtimerState == E_ZTIMER_STATE_RUNNING || eZtimerState == E_ZTIMER_STATE_EXPIRED)
+    if (eZtimerState == E_ZTIMER_STATE_RUNNING)
     {
-        DBG_vPrintf(TRACE_APP, "APP: Blink Led timer is already running\n");
+        DBG_vPrintf(TRACE_LED, "LED: Blink Timer is already running\n");
         return;
     }
 
@@ -64,14 +65,14 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount)
 
     if (bNeedToStart)
     {
-        DBG_vPrintf(TRACE_APP, "APP: Starting blink Led timer\n");
+        DBG_vPrintf(TRACE_LED, "LED: Starting Blink Timer\n");
         ZTIMER_eStart(u8LedBlinkTimer, APP_LED_BLINK_INTERVAL);
     }
 }
 
 PUBLIC void APP_cbBlinkLed(void *pvParam)
 {
-    DBG_vPrintf(TRACE_APP, "APP: APP_cbBlinkLed - Enter\n");
+    DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Enter\n");
     uint32 u32ToggleMask = 0;
     bool bNeedAnotherCycle = FALSE;
     uint8 i;
@@ -97,12 +98,12 @@ PUBLIC void APP_cbBlinkLed(void *pvParam)
     switch (bNeedAnotherCycle)
     {
     case TRUE:
-        DBG_vPrintf(TRACE_APP, "APP: APP_cbBlinkLed - Restart timer\n");
+        DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Restart\n");
         ZTIMER_eStart(u8LedBlinkTimer, APP_LED_BLINK_INTERVAL);
         break;
 
     default:
-        DBG_vPrintf(TRACE_APP, "APP: APP_cbBlinkLed - Stop timer\n");
+        DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Stop\n");
         vAHI_DioSetOutput(0, APP_LEDS_CTRL_MASK);
         ZTIMER_eStop(u8LedBlinkTimer);
         break;

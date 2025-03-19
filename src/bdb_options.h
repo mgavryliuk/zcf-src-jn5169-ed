@@ -53,7 +53,6 @@ extern "C"
 #define BDB_TRUST_CENTER_NODE_JOIN_TIMEOUT (0x0F)    /* bdbTrustCenterNodeJoinTimeout */
 #define BDB_TRUST_CENTER_REQUIRE_KEYEXCHANGE (TRUE)  /* bdbTrustCenterRequireKeyExchange */
 
-#define BDBC_IMP_MAX_REJOIN_CYCLES (10)
    /****************************************************************************/
    /***        Type Definitions                                              ***/
    /****************************************************************************/

@@ -6,6 +6,12 @@
 #include "Identify.h"
 #include "PowerConfiguration.h"
 
+#ifdef DEBUG_BASIC_EP
+#define TRACE_BASIC_EP TRUE
+#else
+#define TRACE_BASIC_EP FALSE
+#endif
+
 typedef struct
 {
     tsZCL_ClusterInstance sBasicServer;
@@ -27,5 +33,6 @@ typedef struct
 } tsZHA_BasicEndpoint;
 
 PUBLIC void APP_vRegisterBasicEndPoint(void);
+PUBLIC void APP_vSendPowerConfigurationClusterReport(void);
 
 #endif /* APP_BASIC_ENDPOINT_H */

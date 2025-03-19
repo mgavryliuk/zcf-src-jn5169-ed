@@ -1,28 +1,25 @@
 #include "dbg.h"
-#include "ZQueue.h"
-#include "ZTimer.h"
 #include "bdb_api.h"
 #include "mac_vs_sap.h"
+#include "pdum_gen.h"
+#include "pwrm.h"
 #include "zps_apl_af.h"
 #include "zps_gen.h"
 #include "AppHardwareApi.h"
-#include "pwrm.h"
-#include "pdum_gen.h"
 #include "PDM.h"
-#include "bdb_api.h"
 
-#include "app_common.h"
+#include "app_basic_endpoint.h"
+#include "app_battery.h"
+#include "app_button.h"
 #include "app_events.h"
 #include "app_led.h"
 #include "app_main.h"
 #include "app_node.h"
-#include "app_button.h"
+#include "app_polling.h"
 
-extern void zps_taskZPS(void);
-PRIVATE void APP_taskEndDevice(void);
-
+PRIVATE pwrm_tsWakeTimerEvent wakeStruct;
 PUBLIC tszQueue APP_msgBdbEvents;
-PUBLIC tszQueue APP_msgButtonEvents;
+PUBLIC tszQueue APP_msgAppEvents;
 
 PRIVATE ZTIMER_tsTimer asTimers[APP_ZTIMER_STORAGE + BDB_ZTIMER_STORAGE];
 
@@ -35,17 +32,21 @@ PRIVATE zps_tsTimeEvent asTimeEvent[TIMER_QUEUE_SIZE];
 
 PUBLIC uint8 u8LedBlinkTimer;
 PUBLIC uint8 u8TimerButtonScan;
-PUBLIC uint8 u8TimerButtonState;
+PUBLIC uint8 u8TimerPoll;
+
+extern void zps_taskZPS(void);
+PRIVATE void APP_taskEndDevice(void);
 
 PUBLIC void APP_vInitResources(void)
 {
-
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Init timers and queues\n");
     ZTIMER_eInit(asTimers, sizeof(asTimers) / sizeof(ZTIMER_tsTimer));
 
     ZTIMER_eOpen(&u8LedBlinkTimer, APP_cbBlinkLed, NULL, ZTIMER_FLAG_PREVENT_SLEEP);
     ZTIMER_eOpen(&u8TimerButtonScan, APP_cbTimerButtonScan, NULL, ZTIMER_FLAG_PREVENT_SLEEP);
+    ZTIMER_eOpen(&u8TimerPoll, APP_cbTimerPoll, NULL, ZTIMER_FLAG_PREVENT_SLEEP);
 
-    ZQ_vQueueCreate(&APP_msgButtonEvents, APP_QUEUE_SIZE, sizeof(APP_tsEvent), (uint8 *)asAppEvent);
+    ZQ_vQueueCreate(&APP_msgAppEvents, APP_QUEUE_SIZE, sizeof(APP_tsEvent), (uint8 *)asAppEvent);
     ZQ_vQueueCreate(&APP_msgBdbEvents, BDB_QUEUE_SIZE, sizeof(BDB_tsZpsAfEvent), (uint8 *)asBdbEvent);
     ZQ_vQueueCreate(&zps_msgMlmeDcfmInd, MLME_QUEQUE_SIZE, sizeof(MAC_tsMlmeVsDcfmInd), (uint8 *)asMacMlmeVsDcfmInd);
     ZQ_vQueueCreate(&zps_msgMcpsDcfmInd, MCPS_QUEUE_SIZE, sizeof(MAC_tsMcpsVsDcfmInd), (uint8 *)asMacMcpsDcfmInd);
@@ -55,24 +56,84 @@ PUBLIC void APP_vInitResources(void)
 
 PRIVATE void vfExtendedStatusCallBack(ZPS_teExtendedStatus eExtendedStatus)
 {
-    DBG_vPrintf(TRACE_APP, "APP: vfExtendedStatusCallBack - Extended status 0x%02x\n", eExtendedStatus);
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: vfExtendedStatusCallBack - Extended status 0x%02x\n", eExtendedStatus);
 }
 
 PUBLIC void APP_vInitialise(void)
 {
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vSetupLeds\n");
     APP_vSetupLeds();
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vConfigureButtons\n");
     APP_vConfigureButtons();
-
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Set PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON)\n");
     PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Init PDM\n");
     PDM_eInitialise(0);
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Init PDUM\n");
     PDUM_vInit();
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Set extended status callback\n");
     ZPS_vExtendedStatusSetCallback(vfExtendedStatusCallBack);
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vInitialiseNode\n");
     APP_vInitialiseNode();
+}
+
+PRIVATE uint8 u8NumberOfTimersTaskTimers(void)
+{
+    uint8 u8NumberOfRunningTimers = 0;
+
+    if (ZTIMER_eGetState(u8LedBlinkTimer) == E_ZTIMER_STATE_RUNNING)
+    {
+        // DBG_vPrintf(TRACE_MAIN, "APP MAIN: Blink timer is still running\n");
+        u8NumberOfRunningTimers++;
+    }
+    if (ZTIMER_eGetState(u8TimerButtonScan) == E_ZTIMER_STATE_RUNNING)
+    {
+        // DBG_vPrintf(TRACE_MAIN, "APP MAIN: Button scan timer is still running\n");
+        u8NumberOfRunningTimers++;
+    }
+    if (ZTIMER_eGetState(u8TimerPoll) == E_ZTIMER_STATE_RUNNING)
+    {
+        // DBG_vPrintf(TRACE_MAIN, "APP MAIN: Poll timer is still running\n");
+        u8NumberOfRunningTimers++;
+    }
+    return u8NumberOfRunningTimers;
+}
+
+PRIVATE void APP_vWakeCallBack(void)
+{
+    DBG_vPrintf(TRUE, "APP MAIN: wake callback triggered\n");
+}
+
+PRIVATE void vAttemptToSleep(void)
+{
+    uint8 u8Status;
+    if ((PWRM_u16GetActivityCount() == 0) && (u8NumberOfTimersTaskTimers() == 0))
+    {
+        /* Stop any background timers that are non sleep preventing*/
+        // like ZCL tick timer
+        // vStopNonSleepPreventingTimers();
+        bool_t bDeepSleep = bNodeIsRunning() ? FALSE : TRUE;
+        if (bDeepSleep)
+        {
+            PWRM_vInit(E_AHI_SLEEP_DEEP);
+            DBG_vPrintf(TRACE_MAIN, "APP MAIN: Node is not running. Setting Deep Sleep mode\n");
+        }
+        else
+        {
+            PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
+            if (u8AHI_WakeTimerStatus() & E_AHI_WAKE_TIMER_MASK_1)
+            {
+                DBG_vPrintf(TRACE_MAIN, "APP MAIN: Wake timer is already configured. Restarting timer...\n");
+                vAHI_WakeTimerStop(E_AHI_WAKE_TIMER_MASK_1);
+            }
+            u8Status = PWRM_eScheduleActivity(&wakeStruct, MAXIMUM_TIME_TO_SLEEP * 1000 * 32, APP_vWakeCallBack);
+            DBG_vPrintf(TRACE_MAIN, "APP MAIN: PWRM_eScheduleActivity status: %d\n", u8Status);
+        }
+    }
 }
 
 PUBLIC void APP_vMainLoop(void)
 {
-    PWRM_vInit(E_AHI_SLEEP_DEEP);
     while (TRUE)
     {
         zps_taskZPS();
@@ -80,11 +141,31 @@ PUBLIC void APP_vMainLoop(void)
         ZTIMER_vTask();
         APP_taskEndDevice();
         vAHI_WatchdogRestart();
+        vAttemptToSleep();
         PWRM_vManagePower();
     }
 }
 
 PRIVATE void APP_taskEndDevice(void)
 {
-    // DBG_vPrintf(TRACE_APP, "APP: APP_taskEndDevice\n");
+    // TODO: think on this shit
+    // APP_tsEvent sAppEvent;
+    // sAppEvent.eType = APP_NO_EVENT;
+    // while (ZQ_bQueueReceive(&APP_msgAppEvents, &sAppEvent) == TRUE)
+    // {
+    //     switch (sAppEvent.eType)
+    //     {
+    //     case APP_JOINED:
+    //     case APP_WAKED_UP:
+    //         APP_vStartFastPolling();
+    //         DBG_vPrintf(TRACE_MAIN, "APP MAIN: Sending PowerConfigurationCluster report\n");
+    //         APP_vSendPowerConfigurationClusterReport();
+    //         DBG_vPrintf(TRACE_MAIN, "APP MAIN: Sending ZIGBEE keep alive\n");
+    //         ZPS_eAplAfSendKeepAlive();
+    //         break;
+
+    //     default:
+    //         break;
+    //     }
+    // }
 }

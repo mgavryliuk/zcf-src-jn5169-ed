@@ -17,7 +17,7 @@
 #define ZCL_MANUFACTURER_CODE 0x1037
 
 /* Sets the number of endpoints that will be created by the ZCL library */
-#define ZCL_NUMBER_OF_ENDPOINTS 4
+#define ZCL_NUMBER_OF_ENDPOINTS 3
 
 /* Set this Tue to disable non error default responses from clusters */
 #define ZCL_DISABLE_DEFAULT_RESPONSES (TRUE)
@@ -26,6 +26,9 @@
 #define ZCL_ATTRIBUTE_READ_SERVER_SUPPORTED
 #define ZCL_ATTRIBUTE_READ_CLIENT_SUPPORTED
 #define ZCL_ATTRIBUTE_WRITE_SERVER_SUPPORTED
+#define ZCL_NUMBER_OF_REPORTS 3
+#define ZCL_SYSTEM_MIN_REPORT_INTERVAL 1
+#define ZCL_SYSTEM_MAX_REPORT_INTERVAL 10
 
 /* Enable wild card profile */
 #define ZCL_ALLOW_WILD_CARD_PROFILE
@@ -54,6 +57,7 @@
 #define CLD_POWER_CONFIGURATION
 #define POWER_CONFIGURATION_SERVER
 #define CLD_PWRCFG_ATTR_BATTERY_VOLTAGE
+#define CLD_PWRCFG_ATTR_BATTERY_PERCENTAGE_REMAINING
 /****************************************************************************/
 /*             Basic Cluster - Optional Attributes                          */
 /*                                                                          */
@@ -71,8 +75,8 @@
 #define CLD_BAS_APP_VERSION (1)
 #define CLD_BAS_STACK_VERSION (1)
 #define CLD_BAS_HARDWARE_VERSION (1)
-#define CLD_BAS_MANUF_NAME_SIZE (3)
-#define CLD_BAS_MODEL_ID_SIZE (13)
+#define CLD_BAS_MANUF_NAME_SIZE (8)
+#define CLD_BAS_MODEL_ID_SIZE (25)
 #define CLD_BAS_DATE_SIZE (8)
 #define CLD_BAS_POWER_SOURCE E_CLD_BAS_PS_BATTERY
 #define CLD_BAS_SW_BUILD_SIZE (9)

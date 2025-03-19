@@ -5,6 +5,12 @@
 #include "OnOff.h"
 #include "MultistateInputBasic.h"
 
+#ifdef DEBUG_ON_OFF_EP
+#define TRACE_ON_OFF_EP TRUE
+#else
+#define TRACE_ON_OFF_EP FALSE
+#endif
+
 typedef struct
 {
     tsZCL_ClusterInstance sOnOffClient;

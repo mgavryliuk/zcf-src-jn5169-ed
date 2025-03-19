@@ -3,9 +3,9 @@
 
 typedef enum
 {
-    APP_E_EVENT_NONE = 0,
-    APP_E_BTN_PRESSED,
-    APP_E_BTN_RELEASED
+    APP_NO_EVENT,
+    APP_JOINED,
+    APP_WAKED_UP
 } APP_teEventType;
 
 typedef struct

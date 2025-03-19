@@ -17,7 +17,6 @@
         "vscode": {
             "extensions": [
                 "ms-vscode.cmake-tools",
-                "twxs.cmake",
                 "ms-python.python",
                 "vscode.markdown-language-features",
                 "ms-vscode.cpptools",

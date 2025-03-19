@@ -1,7 +1,11 @@
 #ifndef APP_BUTTON_H
 #define APP_BUTTON_H
 
-#include "app_events.h"
+#ifdef DEBUG_BUTTON
+#define TRACE_BUTTON TRUE
+#else
+#define TRACE_BUTTON FALSE
+#endif
 
 #define APP_BTN_LEFT_DIO (13)
 #define APP_BTN_LEFT_MASK (1 << APP_BTN_LEFT_DIO)
@@ -13,8 +17,8 @@
 #define APP_BTN_REGISTER_WINDOW_CYCLES 40     // 40 * APP_BTN_TIMER_MSEC = 400ms
 #define APP_BTN_BOTH_REGISTER_CYCLES 10       // 100 * APP_BTN_TIMER_MSEC = 100ms
 #define APP_BTN_LONG_PRESS_REGISTER_CYCLES 70 // 70 * APP_BTN_TIMER_MSEC = 700ms
-#define APP_BTN_IDLE_CYCLES_MAX 500           // 500 * APP_BTN_TIMER_MSEC = 5sec
-#define APP_RESET_NETWORK_CYCLES 1000         // 1000 * APP_BTN_TIMER_MSEC = 8sec
+#define APP_RESET_NETWORK_CYCLES 1000         // 1000 * APP_BTN_TIMER_MSEC = 10sec
+#define APP_BTN_IDLE_CYCLES_MAX 100           // 100 * APP_BTN_TIMER_MSEC = 1sec
 
 typedef enum
 {

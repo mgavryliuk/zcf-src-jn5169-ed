@@ -1,7 +1,10 @@
 #ifndef APP_ENTRYPOINT_H
 #define APP_ENTRYPOINT_H
 
-PUBLIC void APP_vScheduleActivity(void);
-PUBLIC void APP_vWakeCallBack(void);
+#ifdef DEBUG_APP
+#define TRACE_APP TRUE
+#else
+#define TRACE_APP FALSE
+#endif
 
 #endif /* APP_ENTRYPOINT_H */

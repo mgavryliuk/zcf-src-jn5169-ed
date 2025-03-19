@@ -1,7 +1,13 @@
 #ifndef APP_MAIN_H
 #define APP_MAIN_H
 
-#include "bdb_api.h"
+#include "ZQueue.h"
+
+#ifdef DEBUG_MAIN
+#define TRACE_MAIN TRUE
+#else
+#define TRACE_MAIN FALSE
+#endif
 
 #define APP_ZTIMER_STORAGE 3
 #define BDB_QUEUE_SIZE 3
@@ -11,21 +17,22 @@
 #define MCPS_DCFM_QUEUE_SIZE 5
 
 #define APP_QUEUE_SIZE 10
-
-PUBLIC void APP_vInitResources(void);
-PUBLIC void APP_vInitialise(void);
-PUBLIC void APP_vMainLoop(void);
+#define MAXIMUM_TIME_TO_SLEEP 10
 
 extern PUBLIC tszQueue zps_msgMlmeDcfmInd;
 extern PUBLIC tszQueue zps_msgMcpsDcfmInd;
 extern PUBLIC tszQueue zps_msgMcpsDcfm;
 extern PUBLIC tszQueue zps_TimeEvents;
 
-extern PUBLIC tszQueue APP_msgButtonEvents;
+extern PUBLIC tszQueue APP_msgAppEvents;
 extern PUBLIC tszQueue APP_msgBdbEvents;
 
 extern PUBLIC uint8 u8LedBlinkTimer;
 extern PUBLIC uint8 u8TimerButtonScan;
-extern PUBLIC uint8 u8TimerButtonState;
+extern PUBLIC uint8 u8TimerPoll;
+
+PUBLIC void APP_vInitResources(void);
+PUBLIC void APP_vInitialise(void);
+PUBLIC void APP_vMainLoop(void);
 
 #endif /* APP_MAIN_H */

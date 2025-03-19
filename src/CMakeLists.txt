@@ -16,15 +16,14 @@ add_compile_definitions(
     -DJENNIC_CHIP_FAMILY=${JENNIC_CHIP_FAMILY}
     -DJENNIC_CHIP_FAMILY_${JENNIC_CHIP_FAMILY}
 
-    -DDBG_ENABLE
     -DEMBEDDED
     -DPDM_NO_RTOS
     -DJENNIC_MAC_MiniMacShim
     -DJENNIC_STACK_ZBPro
     -DBDB_SUPPORT_NWK_STEERING
 
-    # -DDEBUG_BDB
-    -DDEBUG_APP
+    -DDBG_ENABLE
+    -DDEBUG_JOIN
 )
 
 set(SDK_PREFIX ${PROJECT_SOURCE_DIR}/sdk)
@@ -103,7 +102,7 @@ add_custom_command(
             -o ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-# ============= START - SDK library ============= 
+# ============= START - SDK library =============
 set(SDK_SRC
     ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/app_zps_link_keys.c
     ${SDK_COMPONENTS_BASE_DIR}/ZigbeeCommon/Source/appZpsBeaconHandler.c
@@ -119,6 +118,7 @@ set(SDK_SRC
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_buffer.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_command.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_common.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_configureReportingCommandHandle.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_CustomCommandReceive.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_CustomCommandSend.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_defaultResponse.c
@@ -131,10 +131,14 @@ set(SDK_SRC
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_readAttributesResponseHandle.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_WriteAttributesRequestHandle.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_reportManager.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_reportMaths.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_reportScheduler.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_reportStringHandling.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_reportStructure.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_search.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_timer.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCIF/Source/zcl_transmit.c
-    
+
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/Basic.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/BasicCommandHandler.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/Groups.c
@@ -142,6 +146,7 @@ set(SDK_SRC
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/IdentifyCommandHandler.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/IdentifyServerCommands.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/OnOff.c
+    ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/OnOffCommands.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/OnOffCommandHandler.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/MultiStateInputBasic.c
     ${SDK_COMPONENTS_BASE_DIR}/ZCL/Clusters/General/Source/PowerConfiguration.c
@@ -153,9 +158,6 @@ set(SDK_SRC
 
     pdum_gen.h
 )
-
-message(STATUS "${SDK_SRC}")
-
 add_library(${SDK_TARGET} STATIC ${SDK_SRC})
 
 set(LDLIBS
@@ -179,25 +181,38 @@ set(LDLIBS
     ZPSNWK_${JENNIC_CHIP_FAMILY}
     DBG_${JENNIC_CHIP_FAMILY}
 )
-# ============= END - SDK library ============= 
+# ============= END - SDK library =============
 
-# ============= START - Firmware ============= 
+# ============= START - Firmware =============
 set(APP_SRC
     irq_JN516x.S
 
     app_entrypoint.c
+    app_battery.c
     app_main.c
     app_node.c
     app_basic_endpoint.c
     app_button.c
     app_led.c
     app_on_off_endpoint.c
+    app_polling.c
 
     zps_gen.c
     pdum_gen.c
     pdum_apdu.S
 )
 add_executable(${APP_TARGET} ${APP_SRC})
+
+target_compile_definitions(${APP_TARGET} PRIVATE
+    DEBUG_APP
+    DEBUG_MAIN
+    DEBUG_BUTTON
+    DEBUG_POLL
+    # DEBUG_BATTERY
+    DEBUG_BASIC_EP
+    DEBUG_ON_OFF_EP
+)
+
 
 target_link_libraries(${APP_TARGET}
     -Wl,--start-group
@@ -213,4 +228,4 @@ add_custom_target(${APP_TARGET}.bin ALL
     COMMAND ${CMAKE_COMMAND} -E echo "Generating binary ..."
     COMMAND ${CMAKE_OBJCOPY} -j .version -j .bir -j .flashheader -j .vsr_table -j .vsr_handlers  -j .rodata -j .text -j .data -j .bss -j .heap -j .stack -S -O binary ${APP_TARGET}.elf ${APP_TARGET}.bin
 )
-# ============= END - Firmware ============= 
+# ============= END - Firmware =============
