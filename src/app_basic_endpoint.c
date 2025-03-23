@@ -17,9 +17,11 @@ tsZHA_BasicEndpoint tsBasicEndpoint;
 
 PRIVATE void syncBatteryPercentageRemaining(void)
 {
+    DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Sync Battery data\n");
     tsBatteryData sBatteryData = APP_u8GetBatteryPercentageRemaining();
     tsBasicEndpoint.sPowerConfigurationCluster.u8BatteryPercentageRemaining = sBatteryData.u8BatteryPercentageRemaining * 2;
     tsBasicEndpoint.sPowerConfigurationCluster.u8BatteryVoltage = sBatteryData.u8Voltage;
+    DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Battery data synced: %dV (%d%%)\n", sBatteryData.u8Voltage * 100, sBatteryData.u8BatteryPercentageRemaining);
 }
 
 PUBLIC void APP_vRegisterBasicEndPoint(void)
@@ -78,9 +80,9 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     memcpy(tsBasicEndpoint.sBasicServerCluster.au8DateCode, "20251105", CLD_BAS_DATE_SIZE);
     memcpy(tsBasicEndpoint.sBasicServerCluster.au8SWBuildID, "1000-0001", CLD_BAS_SW_BUILD_SIZE);
 
+    DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Configuring voltage attribute to be reportable\n");
     eZCL_Status = eZCL_SetReportableFlag(WXKG07LM_ALT_BASIC_ENDPOINT, GENERAL_CLUSTER_ID_POWER_CONFIGURATION, TRUE, FALSE, E_CLD_PWRCFG_ATTR_ID_BATTERY_VOLTAGE);
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: eZCL_SetReportableFlag status: %d\n", eZCL_Status);
-
     syncBatteryPercentageRemaining();
 }
 

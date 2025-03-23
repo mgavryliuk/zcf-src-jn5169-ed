@@ -1,14 +1,37 @@
 #ifndef APP_NODE_H
 #define APP_NODE_H
 
+#ifdef DEBUG_NODE
+#define TRACE_NODE TRUE
+#else
+#define TRACE_NODE FALSE
+#endif
+
+#ifdef DEBUG_NODE_BDB
+#define TRACE_NODE_BDB TRUE
+#else
+#define TRACE_NODE_BDB FALSE
+#endif
+
+#ifdef DEBUG_NODE_AF_CB
+#define TRACE_NODE_AF_CB TRUE
+#else
+#define TRACE_NODE_AF_CB FALSE
+#endif
+
+#ifdef DEBUG_NODE_ZDO
+#define TRACE_NODE_ZDO TRUE
+#else
+#define TRACE_NODE_ZDO FALSE
+#endif
+
 #define PDM_ID_APP_END_DEVICE 0x8
 
 typedef enum
 {
     E_NO_NETWORK,
     E_JOINED,
-    E_JOINING,
-    E_JOIN_FAILED
+    E_JOINING
 } teNodeState;
 
 PUBLIC void APP_vInitialiseNode(void);

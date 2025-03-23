@@ -1,44 +1,28 @@
 {
-    "version": 6,
-    "cmakeMinimumRequired": {
-      "major": 3,
-      "minor": 28,
-      "patch": 1
-    },
-    "configurePresets": [
-      {
-        "name": "ubuntu",
-        "displayName": "Ubuntu Preset",
-        "description": "Default build using Unix Makefiles generator",
-        "generator": "Unix Makefiles",
-        "binaryDir": "${sourceDir}/build",
-        "cacheVariables": {
-          "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake"
-        }
-      },
-      {
-        "name": "windows",
-        "displayName": "Windows Preset",
-        "description": "Default build using MinGW32 generator, and sets pointers to NXP SDK at default locations",
-        "generator": "MinGW Makefiles",
-        "binaryDir": "${sourceDir}/build",
-        "cacheVariables": {
-          "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake"
-        }
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 1
+  },
+  "configurePresets": [
+    {
+      "name": "ubuntu",
+      "displayName": "Ubuntu Preset",
+      "description": "Default build using Unix Makefiles generator",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake"
       }
-    ],
-    "buildPresets": [
-      {
-        "name": "ubuntu",
-        "configuration": "Release",
-        "configurePreset": "ubuntu",
-        "targets": "WXKG07LM_ALT.bin"
-      },
-      {
-        "name": "windows",
-        "configuration": "Release",
-        "configurePreset": "windows",
-        "targets": "WXKG07LM_ALT.bin"
-      }
-    ]
-  }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "ubuntu",
+      "configuration": "Release",
+      "configurePreset": "ubuntu",
+      "targets": "WXKG07LM_ALT.bin"
+    }
+  ]
+}

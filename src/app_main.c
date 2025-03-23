@@ -103,7 +103,7 @@ PRIVATE uint8 u8NumberOfTimersTaskTimers(void)
 
 PRIVATE void APP_vWakeCallBack(void)
 {
-    DBG_vPrintf(TRUE, "APP MAIN: wake callback triggered\n");
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: wake callback triggered\n");
     bActivityScheduled = FALSE;
 }
 
@@ -113,14 +113,18 @@ PRIVATE void vAttemptToSleep(void)
     logSleepAttempt++;
     if (logSleepAttempt == 3200 * 10)
     {
-        DBG_vPrintf(TRACE_MAIN, "APP Sleep Handler: Activity Count = %d\n", PWRM_u16GetActivityCount());
-        DBG_vPrintf(TRACE_MAIN, "APP Sleep Handler: Task Timers = %d\n", u8NumberOfTimersTaskTimers());
+        DBG_vPrintf(TRUE, "APP Sleep Handler: Activity Count = %d\n", PWRM_u16GetActivityCount());
+        DBG_vPrintf(TRUE, "APP Sleep Handler: Task Timers = %d\n", u8NumberOfTimersTaskTimers());
         logSleepAttempt = 0;
     }
 #endif
 
     if ((PWRM_u16GetActivityCount() == 0) && (u8NumberOfTimersTaskTimers() == 0))
     {
+#ifdef DBG_ENABLE
+        DBG_vPrintf(TRUE, "APP Sleep Handler: Activity Count = %d\n", PWRM_u16GetActivityCount());
+        DBG_vPrintf(TRUE, "APP Sleep Handler: Task Timers = %d\n", u8NumberOfTimersTaskTimers());
+#endif
         /* Stop any background timers that are non sleep preventing*/
         // like ZCL tick timer
         // vStopNonSleepPreventingTimers();
