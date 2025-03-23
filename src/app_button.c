@@ -2,6 +2,7 @@
 #include "dbg.h"
 #include "portmacro.h"
 #include "pwrm.h"
+#include "bdb_start.h"
 
 #include "app_button.h"
 #include "app_led.h"
@@ -96,18 +97,24 @@ PRIVATE bool_t APP_bHandleButtonState(uint8 u8ButtonDIO, uint32 u32DIOState)
                 sButton->eState = LONG_CLICK;
                 if (sSecondButton->eState == LONG_CLICK)
                 {
-                    DBG_vPrintf(TRACE_BUTTON, "Resetting network...\n");
-                    APP_vBlinkLed(BLINK_BOTH, 5);
-                    if (eGetNodeState() == E_JOINED)
+                    switch (eGetNodeState())
                     {
+                    case E_JOINED:
                         if (ZPS_eAplZdoLeaveNetwork(0UL, FALSE, FALSE) != ZPS_E_SUCCESS)
                         {
-                            APP_vFactoryResetRecordsAndJoin();
+                            DBG_vPrintf(TRACE_BUTTON, "Resetting device...\n");
+                            APP_vFactoryResetRecords();
                         }
-                    }
-                    else
-                    {
-                        APP_vFactoryResetRecordsAndJoin();
+                        break;
+
+                    case E_NO_NETWORK:
+                        DBG_vPrintf(TRACE_BUTTON, "BUTTON: Device is not in network. Starting NWK Steering...\n");
+                        APP_vBlinkLed(BLINK_BOTH, 5);
+                        BDB_eNsStartNwkSteering();
+                        break;
+
+                    default:
+                        break;
                     }
                 }
             }

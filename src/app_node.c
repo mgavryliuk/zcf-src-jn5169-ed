@@ -30,12 +30,12 @@ PRIVATE void handleNeworkJoinFailed(void);
 
 PRIVATE void APP_ZCL_cbGeneralCallback(tsZCL_CallBackEvent *psEvent) {}
 
-PUBLIC teNodeState eGetNodeState()
+PUBLIC teNodeState eGetNodeState(void)
 {
     return eNodeState;
 }
 
-PUBLIC bool_t bNodeIsRunning()
+PUBLIC bool_t bNodeJoined(void)
 {
     return (eGetNodeState() == E_JOINED) ? TRUE : FALSE;
 }
@@ -69,15 +69,11 @@ PRIVATE void APP_vBdbInit(void)
 
     DBG_vPrintf(TRUE, "NODE: APP_vBdbInit\n");
     BDB_tsInitArgs sInitArgs;
-    if (bNodeIsRunning())
+    if (bNodeJoined())
     {
         DBG_vPrintf(TRUE, "NODE: Device is in network. Changing status to E_JOINING...\n");
         eNodeState = E_JOINING;
         sBDB.sAttrib.bbdbNodeIsOnANetwork = TRUE;
-    }
-    else
-    {
-        DBG_vPrintf(TRUE, "NODE: Device is not in network\n");
     }
     sInitArgs.hBdbEventsMsgQ = &APP_msgBdbEvents;
     BDB_vInit(&sInitArgs);
@@ -182,6 +178,7 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
         DBG_vPrintf(TRUE, "APP-ZDO: Joined Network Addr %04x Rejoin %d\n",
                     psAfEvent->uEvent.sNwkJoinedEvent.u16Addr,
                     psAfEvent->uEvent.sNwkJoinedEvent.bRejoin);
+        APP_vSendPowerConfigurationClusterReport();
         break;
 
     case ZPS_EVENT_NWK_FAILED_TO_JOIN:
@@ -203,7 +200,6 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
         {
             DBG_vPrintf(TRUE, "APP-ZDO: LEAVE IND -> For Us No Rejoin\n");
             APP_vFactoryResetRecords();
-            vAHI_SwReset();
         }
         break;
 
@@ -214,7 +210,7 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
         if (psAfEvent->uEvent.sNwkLeaveConfirmEvent.u64ExtAddr == 0UL)
         {
             DBG_vPrintf(TRUE, "APP-ZDO: Leave -> Reset Data Structures\n");
-            APP_vFactoryResetRecordsAndJoin();
+            APP_vFactoryResetRecords();
         }
         break;
 
@@ -271,16 +267,9 @@ PUBLIC void APP_vFactoryResetRecords(void)
     eNodeState = E_NO_NETWORK;
     PDM_eSaveRecordData(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState));
     ZPS_vSaveAllZpsRecords();
-    DBG_vPrintf(TRUE, "NODE: Factory Reset - Finished\n");
-}
-
-PUBLIC void APP_vFactoryResetRecordsAndJoin(void)
-{
-    APP_vFactoryResetRecords();
-    DBG_vPrintf(TRUE, "NODE: Starting NWK Steering\n");
-    eNodeState = E_JOINING;
-    sBDB.sAttrib.bbdbNodeIsOnANetwork = FALSE;
-    BDB_eNsStartNwkSteering();
+    DBG_vPrintf(TRUE, "NODE: Factory Reset - Finished. Reseting device...\n");
+    // Reset device after stack resetting, cause there can be still unprocessed messages that do not allow to sleep
+    vAHI_SwReset();
 }
 
 PRIVATE void handleNetworkJoinAndRejoin(void)
@@ -289,7 +278,6 @@ PRIVATE void handleNetworkJoinAndRejoin(void)
     PDM_eSaveRecordData(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState));
     ZPS_vSaveAllZpsRecords();
     APP_vStartPolling(POLL_FAST);
-    APP_vSendPowerConfigurationClusterReport();
 }
 
 PRIVATE void handleNeworkJoinFailed(void)

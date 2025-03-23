@@ -13,8 +13,7 @@ typedef enum
 
 PUBLIC void APP_vInitialiseNode(void);
 PUBLIC void APP_vFactoryResetRecords(void);
-PUBLIC void APP_vFactoryResetRecordsAndJoin(void);
-PUBLIC teNodeState eGetNodeState();
-PUBLIC bool_t bNodeIsRunning();
+PUBLIC teNodeState eGetNodeState(void);
+PUBLIC bool_t bNodeJoined(void);
 
 #endif /* APP_NODE_H */

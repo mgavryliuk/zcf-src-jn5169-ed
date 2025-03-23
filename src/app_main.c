@@ -17,7 +17,12 @@
 #include "app_node.h"
 #include "app_polling.h"
 
+#ifdef DBG_ENABLE
+PRIVATE uint32 logSleepAttempt = 0;
+#endif
+
 PRIVATE pwrm_tsWakeTimerEvent wakeStruct;
+PRIVATE bool_t bActivityScheduled = FALSE;
 PUBLIC tszQueue APP_msgBdbEvents;
 PUBLIC tszQueue APP_msgAppEvents;
 
@@ -83,17 +88,14 @@ PRIVATE uint8 u8NumberOfTimersTaskTimers(void)
 
     if (ZTIMER_eGetState(u8LedBlinkTimer) == E_ZTIMER_STATE_RUNNING)
     {
-        // DBG_vPrintf(TRACE_MAIN, "APP MAIN: Blink timer is still running\n");
         u8NumberOfRunningTimers++;
     }
     if (ZTIMER_eGetState(u8TimerButtonScan) == E_ZTIMER_STATE_RUNNING)
     {
-        // DBG_vPrintf(TRACE_MAIN, "APP MAIN: Button scan timer is still running\n");
         u8NumberOfRunningTimers++;
     }
     if (ZTIMER_eGetState(u8TimerPoll) == E_ZTIMER_STATE_RUNNING)
     {
-        // DBG_vPrintf(TRACE_MAIN, "APP MAIN: Poll timer is still running\n");
         u8NumberOfRunningTimers++;
     }
     return u8NumberOfRunningTimers;
@@ -102,32 +104,46 @@ PRIVATE uint8 u8NumberOfTimersTaskTimers(void)
 PRIVATE void APP_vWakeCallBack(void)
 {
     DBG_vPrintf(TRUE, "APP MAIN: wake callback triggered\n");
+    bActivityScheduled = FALSE;
 }
 
 PRIVATE void vAttemptToSleep(void)
 {
-    uint8 u8Status;
+#ifdef DBG_ENABLE
+    logSleepAttempt++;
+    if (logSleepAttempt == 3200 * 10)
+    {
+        DBG_vPrintf(TRACE_MAIN, "APP Sleep Handler: Activity Count = %d\n", PWRM_u16GetActivityCount());
+        DBG_vPrintf(TRACE_MAIN, "APP Sleep Handler: Task Timers = %d\n", u8NumberOfTimersTaskTimers());
+        logSleepAttempt = 0;
+    }
+#endif
+
     if ((PWRM_u16GetActivityCount() == 0) && (u8NumberOfTimersTaskTimers() == 0))
     {
         /* Stop any background timers that are non sleep preventing*/
         // like ZCL tick timer
         // vStopNonSleepPreventingTimers();
-        bool_t bDeepSleep = bNodeIsRunning() ? FALSE : TRUE;
+        bool_t bDeepSleep = bNodeJoined() ? FALSE : TRUE;
         if (bDeepSleep)
         {
             PWRM_vInit(E_AHI_SLEEP_DEEP);
-            DBG_vPrintf(TRACE_MAIN, "APP MAIN: Node is not running. Setting Deep Sleep mode\n");
+            DBG_vPrintf(TRACE_MAIN, "APP MAIN: Node is not running. Setting E_AHI_SLEEP_DEEP sleep mode\n");
         }
         else
         {
-            PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
-            if (u8AHI_WakeTimerStatus() & E_AHI_WAKE_TIMER_MASK_1)
+            if (bActivityScheduled == FALSE)
             {
-                DBG_vPrintf(TRACE_MAIN, "APP MAIN: Wake timer is already configured. Restarting timer...\n");
-                vAHI_WakeTimerStop(E_AHI_WAKE_TIMER_MASK_1);
+                PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
+                DBG_vPrintf(TRACE_MAIN, "APP MAIN: Going to E_AHI_SLEEP_OSCON_RAMON sleep for %d seconds\n", MAXIMUM_TIME_TO_SLEEP_SEC);
+                PWRM_teStatus u8Status = PWRM_eScheduleActivity(&wakeStruct, MAXIMUM_TIME_TO_SLEEP_SEC * 1000 * 32, APP_vWakeCallBack);
+                bActivityScheduled = TRUE;
+                DBG_vPrintf(TRACE_MAIN, "APP MAIN: PWRM_eScheduleActivity status: %d\n", u8Status);
             }
-            u8Status = PWRM_eScheduleActivity(&wakeStruct, MAXIMUM_TIME_TO_SLEEP * 1000 * 32, APP_vWakeCallBack);
-            DBG_vPrintf(TRACE_MAIN, "APP MAIN: PWRM_eScheduleActivity status: %d\n", u8Status);
+            else
+            {
+                DBG_vPrintf(TRACE_MAIN, "APP MAIN: PWRM_eScheduleActivity is already running\n");
+            }
         }
     }
 }

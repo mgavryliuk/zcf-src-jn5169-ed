@@ -77,6 +77,10 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     memcpy(tsBasicEndpoint.sBasicServerCluster.au8ModelIdentifier, "lumi.remote.b286acn02.alt", CLD_BAS_MODEL_ID_SIZE);
     memcpy(tsBasicEndpoint.sBasicServerCluster.au8DateCode, "20251105", CLD_BAS_DATE_SIZE);
     memcpy(tsBasicEndpoint.sBasicServerCluster.au8SWBuildID, "1000-0001", CLD_BAS_SW_BUILD_SIZE);
+
+    eZCL_Status = eZCL_SetReportableFlag(WXKG07LM_ALT_BASIC_ENDPOINT, GENERAL_CLUSTER_ID_POWER_CONFIGURATION, TRUE, FALSE, E_CLD_PWRCFG_ATTR_ID_BATTERY_VOLTAGE);
+    DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: eZCL_SetReportableFlag status: %d\n", eZCL_Status);
+
     syncBatteryPercentageRemaining();
 }
 
@@ -117,22 +121,22 @@ PRIVATE void APP_cbBasicEndpointCallback(tsZCL_CallBackEvent *psEvent)
 
 PUBLIC void APP_vSendPowerConfigurationClusterReport(void)
 {
-    syncBatteryPercentageRemaining();
     teZCL_Status eStatus;
     PDUM_thAPduInstance myPDUM_thAPduInstance;
     tsZCL_Address sDestinationAddress;
     sDestinationAddress.uAddress.u16DestinationAddress = 0x0000;
-    sDestinationAddress.eAddressMode = E_ZCL_AM_SHORT;
+    sDestinationAddress.eAddressMode = E_ZCL_AM_SHORT_NO_ACK;
+
+    syncBatteryPercentageRemaining();
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Sending battery report\n");
     myPDUM_thAPduInstance = hZCL_AllocateAPduInstance();
     if (myPDUM_thAPduInstance == PDUM_INVALID_HANDLE)
     {
         DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: PDUM_INVALID_HANDLE\n");
     }
-    eStatus = eZCL_ReportAttribute(
+    eStatus = eZCL_ReportAllAttributes(
         &sDestinationAddress,
         GENERAL_CLUSTER_ID_POWER_CONFIGURATION,
-        E_CLD_PWRCFG_ATTR_ID_BATTERY_PERCENTAGE_REMAINING,
         WXKG07LM_ALT_BASIC_ENDPOINT,
         1,
         myPDUM_thAPduInstance);
@@ -140,6 +144,9 @@ PUBLIC void APP_vSendPowerConfigurationClusterReport(void)
     {
         DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Sending battery report failed with status: %d\n", eStatus);
     }
+    else
+    {
+        DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Battery report sent successfully\n");
+    }
     PDUM_eAPduFreeAPduInstance(myPDUM_thAPduInstance);
-    DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Battery report sent successfully\n");
 }

@@ -17,7 +17,7 @@
 #define MCPS_DCFM_QUEUE_SIZE 5
 
 #define APP_QUEUE_SIZE 10
-#define MAXIMUM_TIME_TO_SLEEP 10
+#define MAXIMUM_TIME_TO_SLEEP_SEC (60 * 60)
 
 extern PUBLIC tszQueue zps_msgMlmeDcfmInd;
 extern PUBLIC tszQueue zps_msgMcpsDcfmInd;

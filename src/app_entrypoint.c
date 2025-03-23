@@ -6,6 +6,7 @@
 #include "bdb_start.h"
 
 #include "app_entrypoint.h"
+#include "app_basic_endpoint.h"
 #include "app_button.h"
 #include "app_main.h"
 #include "app_node.h"
@@ -94,7 +95,7 @@ PUBLIC void vAppMain(void)
 PWRM_CALLBACK(PreSleep)
 {
     DBG_vPrintf(TRACE_APP, "PWRM_CALLBACK(PreSleep): Callback triggered\n");
-    if (bNodeIsRunning())
+    if (bNodeJoined())
     {
         DBG_vPrintf(TRACE_APP, "PWRM_CALLBACK(PreSleep): Saving MAC settings\n");
         vAppApiSaveMacSettings();
@@ -113,6 +114,7 @@ PWRM_CALLBACK(Wakeup)
     APP_vSetUpHardware();
     APP_vConfigureADC();
     ZTIMER_vWake();
-    // TODO: check if anything else needs to be started
+
     APP_vStartPolling(POLL_FAST);
+    APP_vSendPowerConfigurationClusterReport();
 }

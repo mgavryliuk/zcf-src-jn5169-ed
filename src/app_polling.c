@@ -38,7 +38,7 @@ PUBLIC void APP_vStartPolling(tePollMode ePollMode)
 
 PUBLIC void APP_cbTimerPoll(void *pvParam)
 {
-    if (bNodeIsRunning())
+    if (bNodeJoined())
     {
         ZPS_eAplZdoPoll();
         switch (eState)
