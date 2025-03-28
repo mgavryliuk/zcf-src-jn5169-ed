@@ -5,6 +5,7 @@
 #include "Basic.h"
 #include "Identify.h"
 #include "PowerConfiguration.h"
+#include "ButtonMode.h"
 
 #ifdef DEBUG_BASIC_EP
 #define TRACE_BASIC_EP TRUE
@@ -17,6 +18,7 @@ typedef struct
     tsZCL_ClusterInstance sBasicServer;
     tsZCL_ClusterInstance sIdentifyServer;
     tsZCL_ClusterInstance sPowerConfigurationServer;
+    tsZCL_ClusterInstance sButtonModeServer;
 } tsZHA_BasicEndpointClusterInstances __attribute__((aligned(4)));
 
 typedef struct
@@ -30,6 +32,8 @@ typedef struct
     tsCLD_IdentifyCustomDataStructure sIdentifyServerCustomDataStructure;
 
     tsCLD_PowerConfiguration sPowerConfigurationCluster;
+
+    tsCLD_ButtonMode sButtonModeCluster;
 } tsZHA_BasicEndpoint;
 
 PUBLIC void APP_vRegisterBasicEndPoint(void);

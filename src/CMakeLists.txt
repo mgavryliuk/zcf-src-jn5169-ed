@@ -186,6 +186,7 @@ set(LDLIBS
 set(APP_SRC
     irq_JN516x.S
 
+    ButtonMode.c
     app_entrypoint.c
     app_battery.c
     app_main.c
@@ -204,7 +205,7 @@ add_executable(${APP_TARGET} ${APP_SRC})
 
 target_compile_definitions(${APP_TARGET} PRIVATE
     DEBUG_ENTRYPOINT
-    # DEBUG_BASIC_EP
+    DEBUG_BASIC_EP
     # DEBUG_BATTERY
     DEBUG_BUTTON
     DEBUG_MAIN

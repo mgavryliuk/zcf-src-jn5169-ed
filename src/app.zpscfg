@@ -99,6 +99,7 @@
     <Clusters Name="Scenes" Id="0x0005"/>
     <Clusters Name="OnOff" Id="0x0006"/>
     <Clusters Name="MultiStateInput" Id="0x0012"/>
+    <Clusters Name="ButtonMode" Id="0xfc00"/>
   </Profiles>
   <Coordinator Name="Coordinator" DiscoveryNeighbourTableSize="16" ActiveNeighbourTableSize="35" RouteDiscoveryTableSize="35" RoutingTableSize="35" BroadcastTransactionTableSize="35" RouteRecordTableSize="4" AddressMapTableSize="25" SecurityMaterialSets="2" MaxNumSimultaneousApsdeReq="5" MaxNumSimultaneousApsdeAckReq="3" MACMutexName="mutexMAC" ZPSMutexName="mutexZPS" FragmentationMaxNumSimulRx="0" FragmentationMaxNumSimulTx="0" DefaultEventMessageName="APP_vZpsEventHandler" MACDcfmIndMessage="zps_msgDcfmInd" MACTimeEventMessage="zps_msgTimeEvents" apsNonMemberRadius="2" apsDesignatedCoordinator="true" apsUseInsecureJoin="true" apsMaxWindowSize="8" apsInterframeDelay="10" APSDuplicateTableSize="5" apsSecurityTimeoutPeriod="3000" apsUseExtPANId="0x0000000000000000" InitialNetworkKey="Coordinator->DefaultNwkKey" SecurityEnabled="true" MACMlmeDcfmIndMessage="zps_msgMlmeDcfmInd" MACMcpsDcfmIndMessage="zps_msgMcpsDcfmInd" APSPersistenceTime="100" NumAPSMESimulCommands="4" StackProfile="2" InterPAN="false" GreenPowerSupport="false" NwkFcSaveCountBitShift="10" ApsFcSaveCountBitShift="10" MacTableSize="36" DefaultCallbackName="APP_vGenCallback" PermitJoiningTime="255" ChildTableSize="6">
     <Endpoints Id="0" Enabled="true" ApplicationDeviceId="0" ApplicationDeviceVersion="0" Profile="ZDP" Name="ZDO">
@@ -477,6 +478,7 @@
       <InputClusters Cluster="Basic" RxAPDU="WXKG07LM_ALT->apduZCL" Discoverable="true"/>
       <InputClusters Cluster="PowerConfiguration" RxAPDU="WXKG07LM_ALT->apduZCL" Discoverable="true"/>
       <InputClusters Cluster="Identify" RxAPDU="WXKG07LM_ALT->apduZCL" Discoverable="true"/>
+      <InputClusters Cluster="ButtonMode" RxAPDU="WXKG07LM_ALT->apduZCL" Discoverable="true"/>
     </Endpoints>
     <Endpoints Id="2" Enabled="true" ApplicationDeviceId="0" ApplicationDeviceVersion="0" Profile="HomeAutomation" Name="LeftButton">
       <InputClusters Cluster="MultiStateInput" RxAPDU="WXKG07LM_ALT->apduZCL" Discoverable="true"/>
