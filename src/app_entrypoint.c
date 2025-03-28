@@ -116,5 +116,5 @@ PWRM_CALLBACK(Wakeup)
     ZTIMER_vWake();
 
     APP_vStartPolling(POLL_FAST);
-    APP_vSendPowerConfigurationClusterReport();
+    sendBasicEndpointReports();
 }

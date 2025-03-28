@@ -13,6 +13,7 @@
 #include "app_node.h"
 #include "app_on_off_endpoint.h"
 #include "app_polling.h"
+#include "app_button.h"
 
 #define MAX_JOIN_ATTEMPTS 5
 #define JOIN_ATTEMPTS_DELAY 5
@@ -176,7 +177,7 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
         DBG_vPrintf(TRACE_NODE_ZDO, "APP-ZDO: Joined Network Addr %04x Rejoin %d\n",
                     psAfEvent->uEvent.sNwkJoinedEvent.u16Addr,
                     psAfEvent->uEvent.sNwkJoinedEvent.bRejoin);
-        APP_vSendPowerConfigurationClusterReport();
+        sendBasicEndpointReports();
         break;
 
     case ZPS_EVENT_NWK_FAILED_TO_JOIN:
@@ -265,6 +266,8 @@ PUBLIC void APP_vFactoryResetRecords(void)
     eNodeState = E_NO_NETWORK;
     PDM_eSaveRecordData(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState));
     ZPS_vSaveAllZpsRecords();
+
+    resetButtonMode();
     DBG_vPrintf(TRACE_NODE, "NODE: Factory Reset - Finished. Reseting device...\n");
     // Reset device after stack resetting, cause there can be still unprocessed messages that do not allow to sleep
     vAHI_SwReset();

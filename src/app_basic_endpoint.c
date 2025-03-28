@@ -10,8 +10,9 @@
 
 #include "app_basic_endpoint.h"
 #include "app_battery.h"
+#include "app_button.h"
 
-PRIVATE void APP_cbBasicEndpointCallback(tsZCL_CallBackEvent *psEvent);
+PRIVATE void endpointCallback(tsZCL_CallBackEvent *psEvent);
 PRIVATE void handleButtonModeClusterAttrsRange(tsZCL_CallBackEvent *psEvent);
 PRIVATE void handleButtonModeClusterAttrsWrite(tsZCL_CallBackEvent *psEvent);
 
@@ -77,7 +78,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     tsBasicEndpoint.sEndPoint.u16NumberOfClusters = sizeof(tsZHA_BasicEndpointClusterInstances) / sizeof(tsZCL_ClusterInstance);
     tsBasicEndpoint.sEndPoint.psClusterInstance = (tsZCL_ClusterInstance *)&tsBasicEndpoint.sClusterInstance;
     tsBasicEndpoint.sEndPoint.bDisableDefaultResponse = ZCL_DISABLE_DEFAULT_RESPONSES;
-    tsBasicEndpoint.sEndPoint.pCallBackFunctions = &APP_cbBasicEndpointCallback;
+    tsBasicEndpoint.sEndPoint.pCallBackFunctions = &endpointCallback;
 
     eZCL_Status = eZCL_Register(&tsBasicEndpoint.sEndPoint);
     if (eZCL_Status != E_ZCL_SUCCESS)
@@ -93,10 +94,12 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Configuring voltage attribute to be reportable\n");
     eZCL_Status = eZCL_SetReportableFlag(WXKG07LM_ALT_BASIC_ENDPOINT, GENERAL_CLUSTER_ID_POWER_CONFIGURATION, TRUE, FALSE, E_CLD_PWRCFG_ATTR_ID_BATTERY_VOLTAGE);
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: eZCL_SetReportableFlag status: %d\n", eZCL_Status);
+
     syncBatteryPercentageRemaining();
+    tsBasicEndpoint.sButtonModeCluster.eMode = getButtonMode();
 }
 
-PRIVATE void APP_cbBasicEndpointCallback(tsZCL_CallBackEvent *psEvent)
+PRIVATE void endpointCallback(tsZCL_CallBackEvent *psEvent)
 {
     uint16 clusterId = psEvent->psClusterInstance->psClusterDefinition->u16ClusterEnum;
     switch (psEvent->eEventType)
@@ -148,8 +151,12 @@ PRIVATE void handleButtonModeClusterAttrsWrite(tsZCL_CallBackEvent *psEvent)
             DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP CB: Writing attrId %d with value %d\n", attrId, mode);
             if ((mode < E_CLD_BUTTON_MODE_TOGGLE) || (mode > E_CLD_BUTTON_MODE_MULTISTATE_INPUT))
             {
-                DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP CB: Invelid Mode value: %d\n", mode);
-                // TODO: set btn mode and save in PDM
+                DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP CB: Invalid Mode value: %d\n", mode);
+            }
+            else
+            {
+                tsBasicEndpoint.sButtonModeCluster.eMode = mode;
+                setButtonMode(mode);
             }
         }
         break;
@@ -160,13 +167,13 @@ PRIVATE void handleButtonModeClusterAttrsWrite(tsZCL_CallBackEvent *psEvent)
     }
 }
 
-PUBLIC void APP_vSendPowerConfigurationClusterReport(void)
+PUBLIC void sendBasicEndpointReports(void)
 {
     teZCL_Status eStatus;
     PDUM_thAPduInstance myPDUM_thAPduInstance;
     tsZCL_Address sDestinationAddress;
     sDestinationAddress.uAddress.u16DestinationAddress = 0x0000;
-    sDestinationAddress.eAddressMode = E_ZCL_AM_SHORT_NO_ACK;
+    sDestinationAddress.eAddressMode = E_ZCL_AM_SHORT;
 
     syncBatteryPercentageRemaining();
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Sending battery report\n");

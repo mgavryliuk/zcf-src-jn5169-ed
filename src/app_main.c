@@ -67,20 +67,21 @@ PRIVATE void vfExtendedStatusCallBack(ZPS_teExtendedStatus eExtendedStatus)
 
 PUBLIC void APP_vInitialise(void)
 {
-    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vSetupLeds\n");
-    APP_vSetupLeds();
-    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vConfigureButtons\n");
-    APP_vConfigureButtons();
-    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Set PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON)\n");
-    PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
     DBG_vPrintf(TRACE_MAIN, "APP MAIN: Init PDM\n");
     PDM_eInitialise(0);
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Set PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON)\n");
+    PWRM_vInit(E_AHI_SLEEP_OSCON_RAMON);
     DBG_vPrintf(TRACE_MAIN, "APP MAIN: Init PDUM\n");
     PDUM_vInit();
     DBG_vPrintf(TRACE_MAIN, "APP MAIN: Set extended status callback\n");
     ZPS_vExtendedStatusSetCallback(vfExtendedStatusCallBack);
     DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vInitialiseNode\n");
     APP_vInitialiseNode();
+
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vSetupLeds\n");
+    APP_vSetupLeds();
+    DBG_vPrintf(TRACE_MAIN, "APP MAIN: Calling APP_vConfigureButtons\n");
+    APP_vConfigureButtons();
 }
 
 PRIVATE uint8 u8NumberOfTimersTaskTimers(void)

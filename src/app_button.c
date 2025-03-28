@@ -1,23 +1,28 @@
 #include <jendefs.h>
 #include "dbg.h"
+#include "bdb_start.h"
 #include "portmacro.h"
 #include "pwrm.h"
-#include "bdb_start.h"
+#include "zps_gen.h"
+#include "PDM.h"
+#include "OnOff.h"
 
 #include "app_button.h"
 #include "app_led.h"
 #include "app_main.h"
 #include "app_node.h"
-#include "zps_gen.h"
-#include "OnOff.h"
+#include "ButtonMode.h"
 
 PRIVATE bool_t bButtonScanActive = FALSE;
 PRIVATE uint16 u16ButtonIdleCycles = 0;
+PRIVATE teCLD_ButtonMode buttonMode;
 
 APP_tsButtonTracker sButtonTracker = {
     {APP_BTN_LEFT_DIO, IDLE, FALSE, 0, APP_BTN_DEBOUNCE_MASK},
     {APP_BTN_RIGHT_DIO, IDLE, FALSE, 0, APP_BTN_DEBOUNCE_MASK},
     FALSE};
+
+PRIVATE void loadButtonMode(void);
 
 PUBLIC void APP_vConfigureButtons(void)
 {
@@ -25,6 +30,7 @@ PUBLIC void APP_vConfigureButtons(void)
     vAHI_DioSetDirection(APP_BTN_CTRL_MASK, 0);
     vAHI_DioSetPullup(APP_BTN_CTRL_MASK, 0);
     vAHI_DioInterruptEdge(0, APP_BTN_CTRL_MASK);
+    loadButtonMode();
     APP_cbTimerButtonScan(NULL);
 }
 
@@ -152,14 +158,14 @@ PRIVATE bool_t APP_bHandleButtonState(uint8 u8ButtonDIO, uint32 u32DIOState)
                     addr.uAddress.u16DestinationAddress = 0x0000;
                     addr.eAddressMode = E_ZCL_AM_BOUND_NON_BLOCKING;
 
-                    DBG_vPrintf(TRACE_BUTTON, "Sending On/Off command status...");
+                    DBG_vPrintf(TRACE_BUTTON, "Sending On/Off command status...\n");
                     uint8 sequenceNo;
                     teZCL_Status status = eCLD_OnOffCommandSend(WXKG07LM_ALT_LEFTBUTTON_ENDPOINT,
                                                                 1,
                                                                 &addr,
                                                                 &sequenceNo,
                                                                 E_CLD_ONOFF_CMD_TOGGLE);
-                    DBG_vPrintf(TRACE_BUTTON, "Sending On/Off command status: %02x", status);
+                    DBG_vPrintf(TRACE_BUTTON, "Sending On/Off command status: %02x\n", status);
 
                     APP_vResetButtonsState(sButton, NULL);
                 }
@@ -229,4 +235,29 @@ PUBLIC void APP_cbTimerButtonScan(void *pvParam)
         ZTIMER_eStop(u8TimerButtonScan);
         ZTIMER_eStart(u8TimerButtonScan, APP_BTN_TIMER_MSEC);
     }
+}
+
+PUBLIC void setButtonMode(teCLD_ButtonMode mode)
+{
+    DBG_vPrintf(TRACE_BUTTON, "BUTTON: Setting mode %d\n", mode);
+    buttonMode = mode;
+    PDM_eSaveRecordData(PDM_ID_BUTTON_MODE, &buttonMode, sizeof(teCLD_ButtonMode));
+}
+
+PUBLIC teCLD_ButtonMode getButtonMode(void)
+{
+    return buttonMode;
+}
+
+PUBLIC void resetButtonMode(void)
+{
+    setButtonMode(E_CLD_BUTTON_MODE_TOGGLE);
+}
+
+PRIVATE void loadButtonMode(void)
+{
+    uint16 u16ByteRead;
+    buttonMode = E_CLD_BUTTON_MODE_TOGGLE;
+    PDM_eReadDataFromRecord(PDM_ID_BUTTON_MODE, &buttonMode, sizeof(teCLD_ButtonMode), &u16ByteRead);
+    DBG_vPrintf(TRACE_BUTTON, "BUTTON: Loaded button mode %d\n", buttonMode);
 }

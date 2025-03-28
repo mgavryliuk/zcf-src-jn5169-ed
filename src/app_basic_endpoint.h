@@ -37,6 +37,6 @@ typedef struct
 } tsZHA_BasicEndpoint;
 
 PUBLIC void APP_vRegisterBasicEndPoint(void);
-PUBLIC void APP_vSendPowerConfigurationClusterReport(void);
+PUBLIC void sendBasicEndpointReports(void);
 
 #endif /* APP_BASIC_ENDPOINT_H */

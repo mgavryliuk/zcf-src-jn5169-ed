@@ -1,6 +1,8 @@
 #ifndef APP_BUTTON_H
 #define APP_BUTTON_H
 
+#include "ButtonMode.h"
+
 #ifdef DEBUG_BUTTON
 #define TRACE_BUTTON TRUE
 #else
@@ -19,6 +21,8 @@
 #define APP_BTN_LONG_PRESS_REGISTER_CYCLES 70 // 70 * APP_BTN_TIMER_MSEC = 700ms
 #define APP_RESET_NETWORK_CYCLES 1000         // 1000 * APP_BTN_TIMER_MSEC = 10sec
 #define APP_BTN_IDLE_CYCLES_MAX 100           // 100 * APP_BTN_TIMER_MSEC = 1sec
+
+#define PDM_ID_BUTTON_MODE 0x9
 
 typedef enum
 {
@@ -47,5 +51,8 @@ typedef struct
 
 PUBLIC void APP_vConfigureButtons(void);
 PUBLIC void APP_cbTimerButtonScan(void *pvParam);
+PUBLIC teCLD_ButtonMode getButtonMode(void);
+PUBLIC void setButtonMode(teCLD_ButtonMode mode);
+PUBLIC void resetButtonMode(void);
 
 #endif /* APP_BUTTON_H */
