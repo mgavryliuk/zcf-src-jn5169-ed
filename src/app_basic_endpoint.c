@@ -13,8 +13,8 @@
 #include "app_button.h"
 
 PRIVATE void endpointCallback(tsZCL_CallBackEvent *psEvent);
-PRIVATE void handleButtonModeClusterAttrsRange(tsZCL_CallBackEvent *psEvent);
-PRIVATE void handleButtonModeClusterAttrsWrite(tsZCL_CallBackEvent *psEvent);
+PRIVATE void handleConfigurationClusterAttrsRange(tsZCL_CallBackEvent *psEvent);
+PRIVATE void handleConfigurationClusterAttrsWrite(tsZCL_CallBackEvent *psEvent);
 
 tsZHA_BasicEndpoint tsBasicEndpoint;
 
@@ -63,12 +63,12 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
         DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: eCLD_PowerConfigurationCreatePowerConfiguration failed with status: %d\n", eZCL_Status);
     }
 
-    eZCL_Status = eCLD_ButtonModeCreateButtonMode(
-        &tsBasicEndpoint.sClusterInstance.sButtonModeServer,
+    eZCL_Status = eCLD_ConfigurationCreateConfiguration(
+        &tsBasicEndpoint.sClusterInstance.sConfigurationServer,
         TRUE,
-        &sCLD_ButtonMode,
-        &tsBasicEndpoint.sButtonModeCluster,
-        &au8ButtonModeAttributeControlBits[0]);
+        &sCLD_Configuration,
+        &tsBasicEndpoint.sConfigurationCluster,
+        &au8ConfigurationAttributeControlBits[0]);
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Configuring Custom Button Mode cluster status: %d\n", eZCL_Status);
 
     tsBasicEndpoint.sEndPoint.u8EndPointNumber = WXKG07LM_ALT_BASIC_ENDPOINT;
@@ -96,7 +96,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: eZCL_SetReportableFlag status: %d\n", eZCL_Status);
 
     syncBatteryPercentageRemaining();
-    tsBasicEndpoint.sButtonModeCluster.eMode = getButtonMode();
+    tsBasicEndpoint.sConfigurationCluster.eButtonMode = getButtonMode();
 }
 
 PRIVATE void endpointCallback(tsZCL_CallBackEvent *psEvent)
@@ -105,16 +105,16 @@ PRIVATE void endpointCallback(tsZCL_CallBackEvent *psEvent)
     switch (psEvent->eEventType)
     {
     case E_ZCL_CBET_CHECK_ATTRIBUTE_RANGE:
-        if (clusterId == GENERAL_CLUSTER_ID_BUTTON_MODE)
+        if (clusterId == GENERAL_CLUSTER_ID_CONFIGURATION)
         {
-            handleButtonModeClusterAttrsRange(psEvent);
+            handleConfigurationClusterAttrsRange(psEvent);
         }
         break;
 
     case E_ZCL_CBET_WRITE_INDIVIDUAL_ATTRIBUTE:
-        if (clusterId == GENERAL_CLUSTER_ID_BUTTON_MODE)
+        if (clusterId == GENERAL_CLUSTER_ID_CONFIGURATION)
         {
-            handleButtonModeClusterAttrsWrite(psEvent);
+            handleConfigurationClusterAttrsWrite(psEvent);
         }
         break;
 
@@ -124,14 +124,14 @@ PRIVATE void endpointCallback(tsZCL_CallBackEvent *psEvent)
     }
 }
 
-PRIVATE void handleButtonModeClusterAttrsRange(tsZCL_CallBackEvent *psEvent)
+PRIVATE void handleConfigurationClusterAttrsRange(tsZCL_CallBackEvent *psEvent)
 {
     uint16 attrId = psEvent->uMessage.sIndividualAttributeResponse.u16AttributeEnum;
     if (attrId == E_CLD_BUTTON_MODE_ATTR_ID_MODE_TYPE)
     {
         uint8 mode = *((uint8 *)psEvent->uMessage.sIndividualAttributeResponse.pvAttributeData);
         DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP CB: Validating attrId %d with value %d\n", attrId, mode);
-        if ((mode < E_CLD_BUTTON_MODE_TOGGLE) || (mode > E_CLD_BUTTON_MODE_MULTISTATE_INPUT))
+        if ((mode < E_CLD_BUTTON_MODE_NONE) || (mode > E_CLD_BUTTON_MODE_MULTISTATE_INPUT))
         {
             DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP CB: Invelid Mode value: %d\n", mode);
             psEvent->uMessage.sIndividualAttributeResponse.eAttributeStatus = E_ZCL_ERR_ATTRIBUTE_RANGE;
@@ -139,7 +139,7 @@ PRIVATE void handleButtonModeClusterAttrsRange(tsZCL_CallBackEvent *psEvent)
     }
 }
 
-PRIVATE void handleButtonModeClusterAttrsWrite(tsZCL_CallBackEvent *psEvent)
+PRIVATE void handleConfigurationClusterAttrsWrite(tsZCL_CallBackEvent *psEvent)
 {
     uint16 attrId = psEvent->uMessage.sIndividualAttributeResponse.u16AttributeEnum;
     switch (psEvent->uMessage.sIndividualAttributeResponse.eAttributeStatus)
@@ -149,13 +149,13 @@ PRIVATE void handleButtonModeClusterAttrsWrite(tsZCL_CallBackEvent *psEvent)
         {
             uint8 mode = *((uint8 *)psEvent->uMessage.sIndividualAttributeResponse.pvAttributeData);
             DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP CB: Writing attrId %d with value %d\n", attrId, mode);
-            if ((mode < E_CLD_BUTTON_MODE_TOGGLE) || (mode > E_CLD_BUTTON_MODE_MULTISTATE_INPUT))
+            if ((mode < E_CLD_BUTTON_MODE_NONE) || (mode > E_CLD_BUTTON_MODE_MULTISTATE_INPUT))
             {
                 DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP CB: Invalid Mode value: %d\n", mode);
             }
             else
             {
-                tsBasicEndpoint.sButtonModeCluster.eMode = mode;
+                tsBasicEndpoint.sConfigurationCluster.eButtonMode = mode;
                 setButtonMode(mode);
             }
         }

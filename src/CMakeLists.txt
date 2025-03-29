@@ -186,7 +186,7 @@ set(LDLIBS
 set(APP_SRC
     irq_JN516x.S
 
-    ButtonMode.c
+    ConfigurationCluster.c
     app_entrypoint.c
     app_battery.c
     app_main.c

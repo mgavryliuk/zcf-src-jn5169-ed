@@ -11,7 +11,7 @@
 #include "app_led.h"
 #include "app_main.h"
 #include "app_node.h"
-#include "ButtonMode.h"
+#include "ConfigurationCluster.h"
 
 PRIVATE bool_t bButtonScanActive = FALSE;
 PRIVATE uint16 u16ButtonIdleCycles = 0;
@@ -251,13 +251,13 @@ PUBLIC teCLD_ButtonMode getButtonMode(void)
 
 PUBLIC void resetButtonMode(void)
 {
-    setButtonMode(E_CLD_BUTTON_MODE_TOGGLE);
+    setButtonMode(E_CLD_BUTTON_MODE_NONE);
 }
 
 PRIVATE void loadButtonMode(void)
 {
     uint16 u16ByteRead;
-    buttonMode = E_CLD_BUTTON_MODE_TOGGLE;
+    buttonMode = E_CLD_BUTTON_MODE_NONE;
     PDM_eReadDataFromRecord(PDM_ID_BUTTON_MODE, &buttonMode, sizeof(teCLD_ButtonMode), &u16ByteRead);
     DBG_vPrintf(TRACE_BUTTON, "BUTTON: Loaded button mode %d\n", buttonMode);
 }

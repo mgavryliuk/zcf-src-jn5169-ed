@@ -1,7 +1,7 @@
 #ifndef APP_BUTTON_H
 #define APP_BUTTON_H
 
-#include "ButtonMode.h"
+#include "ConfigurationCluster.h"
 
 #ifdef DEBUG_BUTTON
 #define TRACE_BUTTON TRUE
