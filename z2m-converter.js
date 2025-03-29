@@ -4,11 +4,12 @@ const mExt = require('zigbee-herdsman-converters/lib/modernExtend');
 const fz = require('zigbee-herdsman-converters/converters/fromZigbee');
 const tz = require('zigbee-herdsman-converters/converters/toZigbee');
 const { getFromLookup, assertString } = require('zigbee-herdsman-converters/lib/utils');
+const reporting = require('zigbee-herdsman-converters/lib/reporting');
 const e = exposes.presets;
 const ea = exposes.access;
 
 const manufacturerCode = 0x1037;
-const operationModes = ["none", "toggle", "momentary", "multistate"];
+const operationModes = ["not_set", "toggle", "momentary", "multistate"];
 const modeTZLookup = {};
 const modeFZLookup = {};
 operationModes.forEach((mode, index) => {
@@ -77,6 +78,10 @@ const definition = [
                 commandsResponse: {},
             })
         ],
+        configure: async (device, coordinatorEndpoint) => {
+            const endpoint = device.getEndpoint(1);
+            await reporting.bind(endpoint, coordinatorEndpoint, ["genPowerCfg", "ManuConfiguration"]);
+        },
     }
 ]
 

@@ -9,11 +9,12 @@
 #include "PDM.h"
 
 #include "app_basic_endpoint.h"
+#include "app_button.h"
 #include "app_main.h"
 #include "app_node.h"
 #include "app_on_off_endpoint.h"
 #include "app_polling.h"
-#include "app_button.h"
+#include "app_reporting.h"
 
 #define MAX_JOIN_ATTEMPTS 5
 #define JOIN_ATTEMPTS_DELAY 5
@@ -44,9 +45,11 @@ PUBLIC void APP_vInitialiseNode(void)
     uint16 u16ByteRead;
     eNodeState = E_NO_NETWORK;
     PDM_eReadDataFromRecord(PDM_ID_APP_END_DEVICE, &eNodeState, sizeof(teNodeState), &u16ByteRead);
+    DBG_vPrintf(TRACE_NODE, "NODE: Status :%d\n", eNodeState);
     APP_ZCL_vInitialise();
     ZPS_eAplAfInit();
     ZPS_bAplAfSetEndDeviceTimeout(ZED_TIMEOUT_8192_MIN);
+    vMakeSupportedAttributesReportable();
     APP_vBdbInit();
 }
 
@@ -61,6 +64,7 @@ PRIVATE void APP_ZCL_vInitialise(void)
 
     APP_vRegisterBasicEndPoint();
     APP_vRegisterOnOffEndPoints();
+    ZTIMER_eStart(u8TimerTick, ZCL_TICK_TIME);
 }
 
 PRIVATE void APP_vBdbInit(void)
@@ -177,7 +181,7 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
         DBG_vPrintf(TRACE_NODE_ZDO, "APP-ZDO: Joined Network Addr %04x Rejoin %d\n",
                     psAfEvent->uEvent.sNwkJoinedEvent.u16Addr,
                     psAfEvent->uEvent.sNwkJoinedEvent.bRejoin);
-        sendBasicEndpointReports();
+        // sendBasicEndpointReports();
         break;
 
     case ZPS_EVENT_NWK_FAILED_TO_JOIN:
@@ -199,6 +203,7 @@ PRIVATE void vAppHandleZdoEvents(BDB_tsZpsAfEvent *psZpsAfEvent)
         {
             DBG_vPrintf(TRACE_NODE_ZDO, "APP-ZDO: LEAVE IND -> For Us No Rejoin\n");
             APP_vFactoryResetRecords();
+            BDB_eNsStartNwkSteering();
         }
         break;
 
@@ -270,7 +275,19 @@ PUBLIC void APP_vFactoryResetRecords(void)
     resetButtonMode();
     DBG_vPrintf(TRACE_NODE, "NODE: Factory Reset - Finished. Reseting device...\n");
     // Reset device after stack resetting, cause there can be still unprocessed messages that do not allow to sleep
-    vAHI_SwReset();
+    // vAHI_SwReset();
+}
+
+PUBLIC void APP_cbTimerZclTick(void *pvParam)
+{
+
+    DBG_vPrintf(TRACE_NODE, "NODE: APP_cbTimerZclTick\n");
+    ZPS_tsAfEvent sStackEvent;
+    tsZCL_CallBackEvent sCallBackEvent;
+    sCallBackEvent.pZPSevent = &sStackEvent;
+    sCallBackEvent.eEventType = E_ZCL_CBET_TIMER;
+    vZCL_EventHandler(&sCallBackEvent);
+    ZTIMER_eStart(u8TimerTick, ZCL_TICK_TIME);
 }
 
 PRIVATE void handleNetworkJoinAndRejoin(void)

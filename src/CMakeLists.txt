@@ -23,6 +23,7 @@ add_compile_definitions(
     -DBDB_SUPPORT_NWK_STEERING
 
     -DDBG_ENABLE
+    # -DDEBUG_BDB
 )
 
 set(SDK_PREFIX ${PROJECT_SOURCE_DIR}/sdk)
@@ -196,6 +197,7 @@ set(APP_SRC
     app_led.c
     app_on_off_endpoint.c
     app_polling.c
+    app_reporting.c
 
     zps_gen.c
     pdum_gen.c
@@ -204,8 +206,8 @@ set(APP_SRC
 add_executable(${APP_TARGET} ${APP_SRC})
 
 target_compile_definitions(${APP_TARGET} PRIVATE
-    DEBUG_ENTRYPOINT
-    DEBUG_BASIC_EP
+    # DEBUG_ENTRYPOINT
+    # DEBUG_BASIC_EP
     # DEBUG_BATTERY
     DEBUG_BUTTON
     DEBUG_MAIN
@@ -213,8 +215,9 @@ target_compile_definitions(${APP_TARGET} PRIVATE
     # DEBUG_NODE_AF_CB
     # DEBUG_NODE_BDB
     # DEBUG_NODE_ZDO
-    DEBUG_ON_OFF_EP
+    # DEBUG_ON_OFF_EP
     # DEBUG_POLL
+    # DEBUG_REPORT
 )
 
 

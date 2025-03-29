@@ -110,16 +110,15 @@ PRIVATE bool_t APP_bHandleButtonState(uint8 u8ButtonDIO, uint32 u32DIOState)
                         {
                             DBG_vPrintf(TRACE_BUTTON, "Resetting device...\n");
                             APP_vFactoryResetRecords();
+                            BDB_eNsStartNwkSteering();
                         }
                         break;
 
-                    case E_NO_NETWORK:
+                    default:
+                        APP_vFactoryResetRecords();
                         DBG_vPrintf(TRACE_BUTTON, "BUTTON: Device is not in network. Starting NWK Steering...\n");
                         APP_vBlinkLed(BLINK_BOTH, 5);
                         BDB_eNsStartNwkSteering();
-                        break;
-
-                    default:
                         break;
                     }
                 }

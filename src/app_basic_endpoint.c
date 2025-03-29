@@ -94,6 +94,7 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Configuring voltage attribute to be reportable\n");
     eZCL_Status = eZCL_SetReportableFlag(WXKG07LM_ALT_BASIC_ENDPOINT, GENERAL_CLUSTER_ID_POWER_CONFIGURATION, TRUE, FALSE, E_CLD_PWRCFG_ATTR_ID_BATTERY_VOLTAGE);
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: eZCL_SetReportableFlag status: %d\n", eZCL_Status);
+    // setup basic report here
 
     syncBatteryPercentageRemaining();
     tsBasicEndpoint.sConfigurationCluster.eButtonMode = getButtonMode();

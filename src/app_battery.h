@@ -9,7 +9,7 @@
 #endif
 
 #define BATTERY_MIN_MV (2700)
-#define BATTERY_MAX_MV (3200)
+#define BATTERY_MAX_MV (3300)
 #define BATTERY_DELTA_MV (BATTERY_MAX_MV - BATTERY_MIN_MV)
 
 typedef struct

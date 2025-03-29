@@ -1,6 +1,8 @@
 #ifndef APP_NODE_H
 #define APP_NODE_H
 
+#include "ZTimer.h"
+
 #ifdef DEBUG_NODE
 #define TRACE_NODE TRUE
 #else
@@ -38,5 +40,6 @@ PUBLIC void APP_vInitialiseNode(void);
 PUBLIC void APP_vFactoryResetRecords(void);
 PUBLIC teNodeState eGetNodeState(void);
 PUBLIC bool_t bNodeJoined(void);
+PUBLIC void APP_cbTimerZclTick(void *pvParam);
 
 #endif /* APP_NODE_H */

@@ -38,6 +38,7 @@ PRIVATE zps_tsTimeEvent asTimeEvent[TIMER_QUEUE_SIZE];
 PUBLIC uint8 u8LedBlinkTimer;
 PUBLIC uint8 u8TimerButtonScan;
 PUBLIC uint8 u8TimerPoll;
+PUBLIC uint8 u8TimerTick;
 
 extern void zps_taskZPS(void);
 PRIVATE void APP_taskEndDevice(void);
@@ -50,7 +51,7 @@ PUBLIC void APP_vInitResources(void)
     ZTIMER_eOpen(&u8LedBlinkTimer, APP_cbBlinkLed, NULL, ZTIMER_FLAG_PREVENT_SLEEP);
     ZTIMER_eOpen(&u8TimerButtonScan, APP_cbTimerButtonScan, NULL, ZTIMER_FLAG_PREVENT_SLEEP);
     ZTIMER_eOpen(&u8TimerPoll, APP_cbTimerPoll, NULL, ZTIMER_FLAG_PREVENT_SLEEP);
-    // TODO: add ZCL tick timer + Handler and update the sleeping logic
+    ZTIMER_eOpen(&u8TimerTick, APP_cbTimerZclTick, NULL, ZTIMER_FLAG_PREVENT_SLEEP);
 
     ZQ_vQueueCreate(&APP_msgAppEvents, APP_QUEUE_SIZE, sizeof(APP_tsEvent), (uint8 *)asAppEvent);
     ZQ_vQueueCreate(&APP_msgBdbEvents, BDB_QUEUE_SIZE, sizeof(BDB_tsZpsAfEvent), (uint8 *)asBdbEvent);
@@ -103,10 +104,24 @@ PRIVATE uint8 u8NumberOfTimersTaskTimers(void)
     return u8NumberOfRunningTimers;
 }
 
+PRIVATE uint8 u8NumberOfNonSleepPreventingTimers(void)
+{
+    uint8 u8NumberOfRunningTimers = 0;
+
+    if (ZTIMER_eGetState(u8TimerTick) == E_ZTIMER_STATE_RUNNING)
+    {
+        // DBG_vPrintf(TRACE_MAIN, "APP Sleep Handler: u8TimerTick\n");
+        u8NumberOfRunningTimers++;
+    }
+
+    return u8NumberOfRunningTimers;
+}
+
 PRIVATE void APP_vWakeCallBack(void)
 {
     DBG_vPrintf(TRACE_MAIN, "APP MAIN: wake callback triggered\n");
     bActivityScheduled = FALSE;
+    ZTIMER_eStart(u8TimerTick, ZCL_TICK_TIME);
 }
 
 PRIVATE void vAttemptToSleep(void)
@@ -121,8 +136,10 @@ PRIVATE void vAttemptToSleep(void)
     }
 #endif
 
-    if ((PWRM_u16GetActivityCount() == 0) && (u8NumberOfTimersTaskTimers() == 0))
+    if ((PWRM_u16GetActivityCount() == u8NumberOfNonSleepPreventingTimers()) && (u8NumberOfTimersTaskTimers() == 0))
     {
+        ZTIMER_eStop(u8TimerTick);
+
 #ifdef DBG_ENABLE
         DBG_vPrintf(TRUE, "APP Sleep Handler: Activity Count = %d\n", PWRM_u16GetActivityCount());
         DBG_vPrintf(TRUE, "APP Sleep Handler: Task Timers = %d\n", u8NumberOfTimersTaskTimers());

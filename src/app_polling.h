@@ -11,7 +11,7 @@
 #define POLL_FAST_TIME ZTIMER_TIME_MSEC(200)
 
 #define POLL_REGULAR_CYCLES 5
-#define POLL_FAST_CYCLES 25
+#define POLL_FAST_CYCLES 50
 
 typedef enum
 {
