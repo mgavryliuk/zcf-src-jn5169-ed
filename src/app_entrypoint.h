@@ -1,0 +1,10 @@
+#ifndef APP_ENTRYPOINT_H
+#define APP_ENTRYPOINT_H
+
+#ifdef DEBUG_ENTRYPOINT
+#define TRACE_ENTRYPOINT TRUE
+#else
+#define TRACE_ENTRYPOINT FALSE
+#endif
+
+#endif /* APP_ENTRYPOINT_H */

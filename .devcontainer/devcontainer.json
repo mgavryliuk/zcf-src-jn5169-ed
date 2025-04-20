@@ -1,0 +1,39 @@
+{
+    "name": "Ubuntu Docker Image",
+    "build": {
+        "context": "..",
+        "dockerfile": "../ubuntu-cmake.Dockerfile",
+        "options": [
+            "--platform=linux/amd64"
+        ]
+    },
+    "containerEnv": {
+        "WORKSPACE": "${containerWorkspaceFolder}"
+    },
+    "runArgs": [
+        "--platform=linux/amd64"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "ms-python.python",
+                "vscode.markdown-language-features",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cpptools-themes"
+            ]
+        }
+    },
+    "onCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/scripts/download_toolchain.sh",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/common-utils:2.5.2": {
+            "username": "none",
+            "installZsh": "true",
+            "configureZshAsDefaultShell": "true",
+            "installOhMyZsh": "true",
+            "upgradePackages": "false"
+        }
+    }
+}

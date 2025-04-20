@@ -1,0 +1,46 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 1
+  },
+  "configurePresets": [
+    {
+      "name": "WXKG07LM",
+      "displayName": "WXKG07LM",
+      "description": "Presset to build WXKG07LM",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake",
+        "TARGET": "WXKG07LM"
+      }
+    },
+    {
+      "name": "WXKG06LM",
+      "displayName": "WXKG06LM",
+      "description": "Presset to build WXKG06LM",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake",
+        "TARGET": "WXKG06LM"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "WXKG07LM",
+      "configuration": "Release",
+      "configurePreset": "WXKG07LM",
+      "targets": "WXKG07LM.bin"
+    },
+    {
+      "name": "WXKG06LM",
+      "configuration": "Release",
+      "configurePreset": "WXKG06LM",
+      "targets": "WXKG06LM.bin"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+build
+toolchain/**
+!toolchain/CMakeToolchain.cmake
+!.keep
+sdk/**
+!sdk/Tools/
+!sdk/Tools/ZPSConfig/
+!sdk/Tools/PDUMConfig/
+!sdk/Tools/PDUMConfig/PDUMConfig.py
+!sdk/Tools/ZPSConfig/ZPSConfig.py
+
+.DS_Store
+.vscode
