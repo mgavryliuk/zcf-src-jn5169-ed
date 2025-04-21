@@ -8,7 +8,7 @@
 #include "PDM.h"
 #include "PowerConfiguration.h"
 
-#include "app_common.h"
+#include "app_device.h"
 #include "app_basic_endpoint.h"
 #include "app_battery.h"
 #include "app_button.h"

@@ -1,4 +1,5 @@
 set(APP_TARGET ${TARGET})
+message(STATUS "APP_TARGET: ${APP_TARGET}")
 set(SDK_TARGET SDK)
 set(VENV_DIR $ENV{VENV_DIR})
 set(BUILD_NUMBER "000001")
@@ -27,6 +28,9 @@ add_compile_definitions(
 
     # DBG_ENABLE
     # DEBUG_BDB
+    BUILD_DATE="${BUILD_DATE}"
+    BUILD_NUMBER="${BUILD_NUMBER}"
+    TARGET_${APP_TARGET}
 )
 
 set(SDK_PREFIX ${PROJECT_SOURCE_DIR}/sdk)
@@ -211,10 +215,6 @@ set(APP_SRC
 add_executable(${APP_TARGET} ${APP_SRC})
 
 target_compile_definitions(${APP_TARGET} PRIVATE
-    BUILD_DATE="${BUILD_DATE}"
-    BUILD_NUMBER="${BUILD_NUMBER}"
-    TARGET_${APP_TARGET}
-
     # DEBUG_ENTRYPOINT
     # DEBUG_BASIC_EP
     # DEBUG_BATTERY

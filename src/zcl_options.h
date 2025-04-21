@@ -78,17 +78,24 @@
 #define CLD_BAS_HARDWARE_VERSION (1)
 #define CLD_BAS_MANUF_NAME_SIZE (3)
 #define CLD_BAS_MANUF_NAME_STR "DIY"
-#define CLD_BAS_MODEL_ID_SIZE (25)
 #define CLD_BAS_DATE_SIZE (8)
 #define CLD_BAS_SW_BUILD_SIZE (6)
 #define CLD_BAS_POWER_SOURCE E_CLD_BAS_PS_BATTERY
 
 #define CLD_BAS_DATE_STR BUILD_DATE
 #define CLD_BAS_SW_BUILD_STR BUILD_NUMBER
+
 #ifdef TARGET_WXKG07LM
-#define CLD_BAS_MODEL_ID_STR "lumi.remote.b286acn02.alt"
+    #define CLD_BAS_MODEL_ID_STR "lumi.remote.b286acn02.alt"
+    #define CLD_BAS_MODEL_ID_SIZE (25)
+#elif defined(TARGET_WXKG06LM)
+    #define CLD_BAS_MODEL_ID_STR "lumi.remote.b186acn02.alt"
+    #define CLD_BAS_MODEL_ID_SIZE (25)
+#elif defined(TARGET_WXKG11LM)
+    #define CLD_BAS_MODEL_ID_STR "lumi.remote.b1acn01.alt"
+    #define CLD_BAS_MODEL_ID_SIZE (23)
 #else
-#define CLD_BAS_MODEL_ID_STR "lumi.remote.b186acn02.alt"
+    #error "Unknown target device"
 #endif
 
 #endif /* ZCL_OPTIONS_H */

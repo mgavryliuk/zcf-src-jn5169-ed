@@ -6,8 +6,10 @@
 #include "app_main.h"
 
 ts_BlinkConfig sBlinkConfigs[] = {
-    {APP_LED_LEFT_MASK, 0},
-    {APP_LED_RIGHT_MASK, 0},
+    {APP_LED1_MASK, 0},
+#if defined(TARGET_WXKG06LM) || defined(TARGET_WXKG07LM)
+    {APP_LED2_MASK, 0},
+#endif
 };
 
 PUBLIC void APP_vSetupLeds(void)
@@ -19,8 +21,9 @@ PUBLIC void APP_vSetupLeds(void)
 
 PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount)
 {
-    if (u8Amount <= 0)
+    if (u8Amount <= 0 || eBlinkMode == BLINK_NONE)
     {
+        DBG_vPrintf(TRACE_LED, "LED: Invalid blink mode - %d or amount - %d\n", eBlinkMode, u8Amount);
         return;
     }
 
@@ -28,18 +31,22 @@ PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount)
 
     switch (eBlinkMode)
     {
-    case BLINK_LEFT:
-    case BLINK_RIGHT:
+    case BLINK_LED1:
+#if defined(TARGET_WXKG06LM) || defined(TARGET_WXKG07LM)
+    case BLINK_LED2:
         DBG_vPrintf(TRACE_LED, "LED: Blink mode: %d. Cycles: %d\n", eBlinkMode, u16CallbackCycles);
         if (sBlinkConfigs[eBlinkMode].u8Amount == 0)
             sBlinkConfigs[eBlinkMode].u8Amount = u16CallbackCycles;
         break;
+#endif
 
     case BLINK_BOTH:
         DBG_vPrintf(TRACE_LED, "LED: Blink both. Cycles: %d\n", u16CallbackCycles);
         vAHI_DioSetOutput(APP_LEDS_CTRL_MASK, 0);
-        sBlinkConfigs[BLINK_LEFT].u8Amount = u16CallbackCycles;
-        sBlinkConfigs[BLINK_RIGHT].u8Amount = u16CallbackCycles;
+        sBlinkConfigs[BLINK_LED1].u8Amount = u16CallbackCycles;
+#if defined(TARGET_WXKG06LM) || defined(TARGET_WXKG07LM)
+        sBlinkConfigs[BLINK_LED2].u8Amount = u16CallbackCycles;
+#endif
         break;
 
     default:

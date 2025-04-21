@@ -2,7 +2,7 @@
 #include "zcl.h"
 #include "PowerConfiguration.h"
 
-#include "app_common.h"
+#include "app_device.h"
 #include "zcl_options.h"
 #include "app_reporting.h"
 #include "ConfigurationCluster.h"
