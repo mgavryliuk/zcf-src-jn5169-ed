@@ -11,21 +11,6 @@
 #define TRACE_BUTTON FALSE
 #endif
 
-#ifdef TARGET_WXKG07LM
-#define APP_BTN_LEFT_DIO (12)
-#define APP_BTN_LEFT_MASK (1 << APP_BTN_LEFT_DIO)
-#define APP_BTN_RIGHT_DIO (16)
-#define APP_BTN_RIGHT_MASK (1 << APP_BTN_RIGHT_DIO)
-#define APP_BTN_CTRL_MASK (APP_BTN_LEFT_MASK | APP_BTN_RIGHT_MASK)
-#define LEFT_BUTTON_ENDPOINT WXKG07LM_LEFTBUTTON_ENDPOINT
-#define LEFT_BUTTON_BLINK_MODE BLINK_LEFT
-#elif defined(TARGET_WXKG06LM)
-#define APP_BTN_LEFT_DIO (14)
-#define APP_BTN_CTRL_MASK (1 << APP_BTN_LEFT_DIO)
-#define LEFT_BUTTON_ENDPOINT WXKG06LM_BUTTON_ENDPOINT
-#define LEFT_BUTTON_BLINK_MODE BLINK_BOTH
-#endif
-
 #define APP_BTN_TIMER_MSEC ZTIMER_TIME_MSEC(10)
 #define APP_BTN_DEBOUNCE_MASK 0b0111
 #define APP_BTN_REGISTER_WINDOW_CYCLES 40     // 40 * APP_BTN_TIMER_MSEC = 400ms
@@ -57,20 +42,25 @@ typedef enum
 
 typedef struct
 {
+    bool_t bPressed;          // pressed or released
+    uint16 u16Cycles;         // how many cycles last state preserve
+    uint8 u8Debounce;
+} tsPressedState;
+
+typedef struct
+{
     const uint16 u16Endpoint;
     const te_BlinkMode eBlinkMode;
     const uint8 u8ButtonDIO;  // button DIO number
     APP_teButtonState eState; // machineState state
-    bool_t bPressed;          // pressed or released
-    uint16 u16Cycles;         // how many cycles last state preserve
-    uint8 u8Debounce;
+    tsPressedState sPressedState;
 } tsButtonState;
 
 typedef struct
 {
-    tsButtonState sLeftState;
+    tsButtonState sBtn1State;
 #ifdef TARGET_WXKG07LM
-    tsButtonState sRightState;
+    tsButtonState sBtn2State;
 #endif
 } APP_tsButtonTracker;
 

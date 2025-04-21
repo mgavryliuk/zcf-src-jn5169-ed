@@ -1,12 +1,10 @@
 - [Overview](#overview)
 - [Getting Started](#getting-started)
-- [Device](#device)
-  - [Board](#board)
-  - [Circuit diagrams](#circuit-diagrams)
+- [Devices](#devices)
 - [JN5169 Documentation](#jn5169-documentation)
 
 # Overview
-**WXKG07LM** and **WXKG06LM** come with a very limited feature set and uses the JN5169 chip. This repository aims to develop custom firmware to replace the original and improve functionality.
+This repository provides custom firmware implementations for JN5169 MCU-based devices.
 
 Pre-built firmwares can be found in the [zigbee-custom-firmwares](https://github.com/mgavryliuk/zigbee-custom-firmwares) repository.
 
@@ -14,34 +12,16 @@ Pre-built firmwares can be found in the [zigbee-custom-firmwares](https://github
 This project uses VS Code and [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) for development and building.
 1. Install [Visual Studio Code](https://code.visualstudio.com/).
 2. Follow the [Dev Containers tutorial](https://code.visualstudio.com/docs/devcontainers/tutorial) and open the project in the remote environment.
+    - Use `.devcontainer/scripts/install-vscode-extensions.sh` to install extenstion into container if they were not installed automatically.
 3. Download SDK `JN-SW-4170` from NXP site and add into sdk directory.
 4. Click the `Build` button to compile the project.
 
-# Device
-`WXKG07LM` and `WXKG06LM` share the same board but has diferent buttons soldered.
-
-**WXKG07LM DIOs definition:**
-- Left LED - DIO 10
-- Right LED - DIO 11
-- Left button - DIO 12
-- Right button - DIO 16
-
-**WXKG06LM DIOs definition:**
-- Left LED - DIO 10
-- Right LED - DIO 11
-- Button - DIO 14
-
-## Board
-Version: LM15-WS R1.1</br>
-![Board Front](docs/images/board_front.png)
-![Board Back](docs/images/board_back.png)
-
-## Circuit diagrams
-LEDs circuit: </br>
-![LEDs circuit](docs/images/leds_circuit.png)
-
-Buttons circuit:</br>
-![Buttons circuit](docs/images/buttons_circuit.png)
+# Devices
+| Device | Description | Documentation | Build Preset |
+|--------|-------------|---------------|--------------|
+| WXKG06LM | Wireless remote switch D1 (single rocker) | [Documentation](docs/WXKG06LM.md) | `WXKG06LM` |
+| WXKG07LM | Wireless remote switch D1 (double rocker) | [Documentation](docs/WXKG07LM.md) | `WXKG07LM` |
+| WXKG11LM | Wireless mini switch | [Documentation](docs/WXKG11LM.md) | `WXKG11LM` |
 
 # JN5169 Documentation
 [Product page](https://www.nxp.com/products/JN5169)</br>

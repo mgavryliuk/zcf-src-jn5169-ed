@@ -9,18 +9,28 @@
 #define TRACE_LED FALSE
 #endif
 
-#define APP_LED_LEFT_DIO (10)
-#define APP_LED_LEFT_MASK (1UL << APP_LED_LEFT_DIO)
-#define APP_LED_RIGHT_DIO (11)
-#define APP_LED_RIGHT_MASK (1UL << APP_LED_RIGHT_DIO)
-#define APP_LEDS_CTRL_MASK (APP_LED_LEFT_MASK | APP_LED_RIGHT_MASK)
+#if defined(TARGET_WXKG06LM) || defined(TARGET_WXKG07LM)
+    #define APP_LED1_DIO (10)
+    #define APP_LED1_MASK (1UL << APP_LED1_DIO)
+    #define APP_LED2_DIO (11)
+    #define APP_LED2_MASK (1UL << APP_LED2_DIO)
+    #define APP_LEDS_CTRL_MASK (APP_LED1_MASK | APP_LED2_MASK)
+#elif defined(TARGET_WXKG11LM)
+    #define APP_LED1_DIO (11)
+    #define APP_LED1_MASK (1UL << APP_LED1_DIO)
+    #define APP_LEDS_CTRL_MASK (APP_LED1_MASK)
+#else
+    #error "Unknown target device"
+#endif
+
 #define APP_LED_BLINK_INTERVAL ZTIMER_TIME_MSEC(100)
 
 typedef enum
 {
-    BLINK_LEFT,
-    BLINK_RIGHT,
-    BLINK_BOTH
+    BLINK_LED1,
+    BLINK_LED2,
+    BLINK_BOTH,
+    BLINK_NONE,
 } te_BlinkMode;
 
 typedef struct

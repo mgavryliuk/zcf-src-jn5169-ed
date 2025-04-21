@@ -18,7 +18,6 @@
             "extensions": [
                 "ms-vscode.cmake-tools",
                 "ms-python.python",
-                "vscode.markdown-language-features",
                 "ms-vscode.cpptools",
                 "ms-vscode.cpptools-extension-pack",
                 "ms-vscode.cpptools-themes"

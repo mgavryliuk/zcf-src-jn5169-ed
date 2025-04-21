@@ -5,8 +5,8 @@
 #include "pwrm.h"
 #include "bdb_start.h"
 
+#include "app_device.h"
 #include "app_entrypoint.h"
-#include "app_button.h"
 #include "app_main.h"
 #include "app_node.h"
 #include "app_events.h"

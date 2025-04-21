@@ -27,6 +27,17 @@
         "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake",
         "TARGET": "WXKG06LM"
       }
+    },
+    {
+      "name": "WXKG11LM",
+      "displayName": "WXKG11LM",
+      "description": "Presset to build WXKG11LM",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "toolchain/CMakeToolchain.cmake",
+        "TARGET": "WXKG11LM"
+      }
     }
   ],
   "buildPresets": [
@@ -41,6 +52,12 @@
       "configuration": "Release",
       "configurePreset": "WXKG06LM",
       "targets": "WXKG06LM.bin"
+    },
+    {
+      "name": "WXKG11LM",
+      "configuration": "Release",
+      "configurePreset": "WXKG11LM",
+      "targets": "WXKG11LM.bin"
     }
   ]
 }

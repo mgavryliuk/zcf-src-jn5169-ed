@@ -6,10 +6,13 @@
 #include "MultistateInputBasic.h"
 
 #include "app_on_off_endpoint.h"
+#include "app_device.h"
 #include "app_button.h"
 
-tsZHA_OnOffEndpoint tsOnOffLeftButtonEndpoint;
-tsZHA_OnOffEndpoint tsOnOffRightButtonEndpoint;
+tsZHA_OnOffEndpoint tsOnOffButton1Endpoint;
+#ifdef TARGET_WXKG07LM
+    tsZHA_OnOffEndpoint tsOnOffButton2Endpoint;
+#endif
 
 PRIVATE void APP_cbOnOffEndpointCallback(tsZCL_CallBackEvent *psEvent);
 
@@ -70,9 +73,9 @@ PRIVATE void APP_vRegisterOnOffEndPoint(uint8 u8EndPoint, tsZHA_OnOffEndpoint *t
 
 PUBLIC void APP_vRegisterOnOffEndPoints(void)
 {
-    APP_vRegisterOnOffEndPoint(WXKG07LM_LEFTBUTTON_ENDPOINT, &tsOnOffLeftButtonEndpoint);
+    APP_vRegisterOnOffEndPoint(APP_BTN1_ENDPOINT, &tsOnOffButton1Endpoint);
 #ifdef TARGET_WXKG07LM
-    APP_vRegisterOnOffEndPoint(WXKG07LM_RIGHTBUTTON_ENDPOINT, &tsOnOffRightButtonEndpoint);
+    APP_vRegisterOnOffEndPoint(APP_BTN2_ENDPOINT, &tsOnOffButton2Endpoint);
 #endif
 }
 
@@ -101,14 +104,18 @@ PUBLIC teZCL_Status eReportAction(uint16 u16Endpoint, teButtonAction eButtonActi
     addr.uAddress.u16DestinationAddress = 0x0000;
     addr.eAddressMode = E_ZCL_AM_SHORT_NO_ACK;
 
-    if (u16Endpoint == WXKG07LM_LEFTBUTTON_ENDPOINT)
+#ifdef TARGET_WXKG07LM
+    if (u16Endpoint == APP_BTN1_ENDPOINT)
+#endif
     {
-        tsButtonEndpoint = &tsOnOffLeftButtonEndpoint;
+        tsButtonEndpoint = &tsOnOffButton1Endpoint;
     }
+#ifdef TARGET_WXKG07LM
     else
     {
-        tsButtonEndpoint = &tsOnOffRightButtonEndpoint;
+        tsButtonEndpoint = &tsOnOffButton2Endpoint;
     }
+#endif
     tsButtonEndpoint->sMultistateInputServerCluster.u16PresentValue = (zuint16)eButtonAction;
 
     DBG_vPrintf(TRACE_ON_OFF_EP, "ON_OFF EP: Reporting multistate action EP=%d value=%d...\n", u16Endpoint, tsButtonEndpoint->sMultistateInputServerCluster.u16PresentValue);
