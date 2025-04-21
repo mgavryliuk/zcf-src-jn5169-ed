@@ -10,9 +10,9 @@
 #include "app_button.h"
 
 tsZHA_OnOffEndpoint tsOnOffButton1Endpoint;
-#ifdef TARGET_WXKG07LM
-    tsZHA_OnOffEndpoint tsOnOffButton2Endpoint;
-#endif
+// #ifdef TARGET_WXKG07LM
+tsZHA_OnOffEndpoint tsOnOffButton2Endpoint;
+// #endif
 
 PRIVATE void APP_cbOnOffEndpointCallback(tsZCL_CallBackEvent *psEvent);
 
@@ -74,9 +74,9 @@ PRIVATE void APP_vRegisterOnOffEndPoint(uint8 u8EndPoint, tsZHA_OnOffEndpoint *t
 PUBLIC void APP_vRegisterOnOffEndPoints(void)
 {
     APP_vRegisterOnOffEndPoint(APP_BTN1_ENDPOINT, &tsOnOffButton1Endpoint);
-#ifdef TARGET_WXKG07LM
+// #ifdef TARGET_WXKG07LM
     APP_vRegisterOnOffEndPoint(APP_BTN2_ENDPOINT, &tsOnOffButton2Endpoint);
-#endif
+// #endif
 }
 
 PUBLIC teZCL_Status eSendCommand(uint16 u16Endpoint, teCLD_OnOff_Command eOnOffCommand)

@@ -138,7 +138,13 @@ PRIVATE void handleButtonEvent(APP_tsEvent *sAppEvent)
         break;
 
     case BUTTON_SINGLE_CLICK_ACTION:
+        eReportAction(sAppEvent->uEvent.sButton.u16Endpoint, sAppEvent->uEvent.sButton.eButtonAction);
+        eSendCommand(WXKG11LM_ONBUTTON_ENDPOINT, E_CLD_ONOFF_CMD_ON);
+        break;
     case BUTTON_DOUBLE_CLICK_ACTION:
+        eReportAction(sAppEvent->uEvent.sButton.u16Endpoint, sAppEvent->uEvent.sButton.eButtonAction);
+        eSendCommand(WXKG11LM_OFFBUTTON_ENDPOINT, E_CLD_ONOFF_CMD_OFF);
+        break;
     case BUTTON_TRIPLE_CLICK_ACTION:
     case BUTTON_LONG_PRESSED_ACTION:
     case BUTTON_LONG_RELEASED_ACTION:
