@@ -25,7 +25,7 @@ add_compile_definitions(
     BDB_SUPPORT_NWK_STEERING
     ZBPRO_DEVICE_TYPE_ZED
 
-    DBG_ENABLE
+    # DBG_ENABLE
     # DEBUG_BDB
     BUILD_DATE="${BUILD_DATE}"
     BUILD_NUMBER="${BUILD_NUMBER}"
@@ -82,7 +82,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T${SDK_PREFIX}/Chip/${JEN
 
 set(ZPS_CONFIG "${SDK_PREFIX}/Tools/ZPSConfig/ZPSConfig.py")
 set(PDUM_CONFIG "${SDK_PREFIX}/Tools/PDUMConfig/PDUMConfig.py")
-set(ZPSCFG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/common/src/app.zpscfg")
+set(ZPSCFG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${APP_TARGET}/app.zpscfg")
 add_custom_command(
     OUTPUT
         zps_gen.c
