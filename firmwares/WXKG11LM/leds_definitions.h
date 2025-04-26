@@ -1,0 +1,8 @@
+#ifndef LEDS_DEFINITIONS_H
+#define LEDS_DEFINITIONS_H
+
+#define LED_DIO (11)
+#define LED_MASK (1UL << LED_DIO)
+#define LEDS_CTRL_MASK (LED_MASK)
+
+#endif /* LEDS_DEFINITIONS_H */

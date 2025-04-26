@@ -19,9 +19,9 @@ This project uses VS Code and [Dev Containers](https://code.visualstudio.com/doc
 # Devices
 | Device | Description | Documentation | Build Preset |
 |--------|-------------|---------------|--------------|
-| WXKG06LM | Wireless remote switch D1 (single rocker) | [Documentation](docs/WXKG06LM.md) | `WXKG06LM` |
-| WXKG07LM | Wireless remote switch D1 (double rocker) | [Documentation](docs/WXKG07LM.md) | `WXKG07LM` |
-| WXKG11LM | Wireless mini switch | [Documentation](docs/WXKG11LM.md) | `WXKG11LM` |
+| WXKG06LM | Wireless remote switch D1 (single rocker) | [Documentation](firmwares/WXKG06LM/README.md) | `WXKG06LM` |
+| WXKG07LM | Wireless remote switch D1 (double rocker) | [Documentation](firmwares/WXKG07LM/README.md) | `WXKG07LM` |
+| WXKG11LM | Wireless mini switch | [Documentation](firmwares/WXKG11LM/README.md) | `WXKG11LM` |
 
 # JN5169 Documentation
 [Product page](https://www.nxp.com/products/JN5169)</br>

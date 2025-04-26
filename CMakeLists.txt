@@ -6,4 +6,4 @@ project(JN5169_ZIGBEE)
 enable_language(ASM)
 enable_language(C)
 
-add_subdirectory(src)
+add_subdirectory(firmwares)
