@@ -10,6 +10,7 @@
 #include "app_buttons.h"
 #include "app_button_actions.h"
 #include "app_events.h"
+#include "app_led.h"
 #include "app_resources.h"
 
 PRIVATE uint16 u16ButtonIdleCycles = 0;
@@ -105,7 +106,9 @@ PRIVATE void vHandleButtonModeToogle(tsButtonState *sButtonState)
     case 0:
         if (!sButtonState->bPressed)
         {
-            // APP_vBlinkLed(sButtonState->eBlinkMode, 1);
+            if (sButtonState->u.sEndpointBtnConfig->bHasLed) {
+                APP_vBlinkLed(sButtonState->u.sEndpointBtnConfig->u32LedMask, 1);
+            }
             DBG_vPrintf(TRACE_BUTTON, "BUTTON: DIO for mask %x pressed. Endpoint %d\n", sButtonState->u.sEndpointBtnConfig->u32DioMask, sButtonState->u.sEndpointBtnConfig->u16Endpoint);
             sButtonState->bPressed = TRUE;
             APP_vSendButtonEvent(sButtonState->u.sEndpointBtnConfig->u16Endpoint, BUTTON_TOGGLE_ACTION);
@@ -132,7 +135,9 @@ PRIVATE void vHandleButtonModeMomentaryOnOff(tsButtonState *sButtonState)
     case 0:
         if (!sButtonState->bPressed)
         {
-            // APP_vBlinkLed(sButtonState->eBlinkMode, 1);
+            if (sButtonState->u.sEndpointBtnConfig->bHasLed) {
+                APP_vBlinkLed(sButtonState->u.sEndpointBtnConfig->u32LedMask, 1);
+            }
             DBG_vPrintf(TRACE_BUTTON, "BUTTON: DIO for mask %x pressed. Endpoint %d\n", sButtonState->u.sEndpointBtnConfig->u32DioMask, sButtonState->u.sEndpointBtnConfig->u16Endpoint);
             sButtonState->bPressed = TRUE;
             APP_vSendButtonEvent(sButtonState->u.sEndpointBtnConfig->u16Endpoint, BUTTON_MOMENTRAY_PRESSED_ACTION);
@@ -163,7 +168,9 @@ PRIVATE void vHandleButtonModeMultistate(tsButtonState *sButtonState)
         {
             DBG_vPrintf(TRACE_BUTTON, "BUTTON: DIO for mask %x pressed\n", sButtonState->u.sEndpointBtnConfig->u32DioMask);
             sButtonState->bPressed = TRUE;
-            // APP_vBlinkLed(sButtonState->eBlinkMode, 1);
+            if (sButtonState->u.sEndpointBtnConfig->bHasLed) {
+                APP_vBlinkLed(sButtonState->u.sEndpointBtnConfig->u32LedMask, 1);
+            }
             sButtonState->u16Cycles = 0;
         }
         switch (sButtonState->eState)
@@ -275,7 +282,6 @@ PRIVATE bool_t bHandleResetButtonPressed(uint32 u32DIOState)
         sResetButtonState.u16Cycles++;
         if (!sResetButtonState.bPressed)
         {
-            // APP_vBlinkLed(APP_RESET_DEVICE_BLINK_MODE, 1);
             DBG_vPrintf(TRACE_BUTTON, "BUTTON: Reset device combination pressed. Reset mask: %x\n", sResetButtonState.u.sResetBtnConfig->u32DioMask);
             sResetButtonState.bPressed = TRUE;
         }

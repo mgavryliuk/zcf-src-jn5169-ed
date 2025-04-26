@@ -77,7 +77,7 @@ PWRM_CALLBACK(PreSleep)
     DBG_vPrintf(TRUE, "PWRM_CALLBACK: PreSleep callback triggered\n");
     if (bNodeJoined())
     {
-        DBG_vPrintf(TRUE, "PWRM_CALLBACK: Node is joined.Saving MAC settings\n");
+        DBG_vPrintf(TRUE, "PWRM_CALLBACK: Node is joined. Saving MAC settings\n");
         vAppApiSaveMacSettings();
     }
     ZTIMER_vSleep();

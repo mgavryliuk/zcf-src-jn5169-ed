@@ -1,17 +1,16 @@
 #include <jendefs.h>
+
 #include "dbg.h"
 #include "AppHardwareApi.h"
 
 #include "device_config.h"
+#include "app_resources.h"
 #include "app_led.h"
 #include "app_main.h"
 
-// ts_BlinkConfig sBlinkConfigs[] = {
-//     {APP_LED1_MASK, 0},
-// #if defined(TARGET_WXKG06LM) || defined(TARGET_WXKG07LM)
-//     {APP_LED2_MASK, 0},
-// #endif
-// };
+#define MAX_BLINKS (5)
+
+PRIVATE ts_BlinkState sBlinkStates[MAX_BLINKS];
 
 PUBLIC void APP_vSetupLeds(void)
 {
@@ -20,99 +19,79 @@ PUBLIC void APP_vSetupLeds(void)
     vAHI_DioSetOutput(sDeviceConfig.sDioConfig.u32LedMask, 0);
 }
 
-PUBLIC void APP_cbTimerLedBlink(te_BlinkMode eBlinkMode, uint8 u8Amount)
+PUBLIC void APP_vBlinkLed(uint32 u32LedMask, uint8 u8BlinkCount)
 {
-//     if (u8Amount <= 0 || eBlinkMode == BLINK_NONE)
-//     {
-//         DBG_vPrintf(TRACE_LED, "LED: Invalid blink mode - %d or amount - %d\n", eBlinkMode, u8Amount);
-//         return;
-//     }
+    uint8 i;
+    for (i = 0; i < MAX_BLINKS; i++)
+    {
+        if (sBlinkStates[i].u32Mask & u32LedMask)
+        {
+            DBG_vPrintf(TRACE_LED, "LED: Blink already in progress for mask: %08x\n", u32LedMask);
+            return;
+        }
+    }
 
-//     uint16 u16CallbackCycles = u8Amount << 1;
+    DBG_vPrintf(TRACE_LED, "LED: Starting Blink for mask: %08x\n", u32LedMask);
+    for (i = 0; i < MAX_BLINKS; i++)
+    {
+        if (sBlinkStates[i].u32Mask == 0)
+        {
+            sBlinkStates[i].u32Mask = u32LedMask;
+            sBlinkStates[i].u8Cycles = u8BlinkCount << 1;
+            sBlinkStates[i].bIsOn = FALSE;
+            break;
+        }
+    }
 
-//     switch (eBlinkMode)
-//     {
-//     case BLINK_LED1:
-// #if defined(TARGET_WXKG06LM) || defined(TARGET_WXKG07LM)
-//     case BLINK_LED2:
-//         DBG_vPrintf(TRACE_LED, "LED: Blink mode: %d. Cycles: %d\n", eBlinkMode, u16CallbackCycles);
-//         if (sBlinkConfigs[eBlinkMode].u8Amount == 0)
-//             sBlinkConfigs[eBlinkMode].u8Amount = u16CallbackCycles;
-//         break;
-// #endif
-
-//     case BLINK_BOTH:
-//         DBG_vPrintf(TRACE_LED, "LED: Blink both. Cycles: %d\n", u16CallbackCycles);
-//         vAHI_DioSetOutput(APP_LEDS_CTRL_MASK, 0);
-//         // sBlinkConfigs[BLINK_LED1].u8Amount = u16CallbackCycles;
-// #if defined(TARGET_WXKG06LM) || defined(TARGET_WXKG07LM)
-//         sBlinkConfigs[BLINK_LED2].u8Amount = u16CallbackCycles;
-// #endif
-//         break;
-
-//     default:
-//         break;
-//     }
-
-//     ZTIMER_teState eZtimerState = ZTIMER_eGetState(u8LedBlinkTimer);
-//     if (eZtimerState == E_ZTIMER_STATE_RUNNING)
-//     {
-//         DBG_vPrintf(TRACE_LED, "LED: Blink Timer is already running\n");
-//         return;
-//     }
-
-//     bool bNeedToStart = FALSE;
-//     uint8 i;
-//     for (i = 0; i < sizeof(sBlinkConfigs) / sizeof(ts_BlinkConfig); i++)
-//     {
-//         if (sBlinkConfigs[i].u8Amount > 0)
-//         {
-//             bNeedToStart = TRUE;
-//             break;
-//         }
-//     }
-
-//     if (bNeedToStart)
-//     {
-//         DBG_vPrintf(TRACE_LED, "LED: Starting Blink Timer\n");
-//         ZTIMER_eStart(u8LedBlinkTimer, APP_LED_BLINK_INTERVAL);
-//     }
+    ZTIMER_teState eZtimerState = ZTIMER_eGetState(u8TimerLedBlink);
+    if (eZtimerState == E_ZTIMER_STATE_RUNNING)
+    {
+        DBG_vPrintf(TRACE_LED, "LED: Blink Timer is already running\n");
+        return;
+    }
+    DBG_vPrintf(TRACE_LED, "LED: Starting Blink Timer\n");
+    ZTIMER_eStart(u8TimerLedBlink, LED_BLINK_INTERVAL);
 }
 
-PUBLIC void APP_cbBlinkLed(void *pvParam)
+PUBLIC void APP_cbTimerLedBlink(void *pvParam)
 {
-    // DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Enter\n");
-    // uint32 u32ToggleMask = 0;
-    // bool bNeedAnotherCycle = FALSE;
-    // uint8 i;
-    // for (i = 0; i < sizeof(sBlinkConfigs) / sizeof(ts_BlinkConfig); i++)
-    // {
-    //     if (sBlinkConfigs[i].u8Amount > 0)
-    //     {
-    //         u32ToggleMask |= sBlinkConfigs[i].u32Mask;
-    //         sBlinkConfigs[i].u8Amount--;
-    //         if (sBlinkConfigs[i].u8Amount > 0)
-    //         {
-    //             bNeedAnotherCycle = TRUE;
-    //         }
-    //     }
-    // }
+    DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Enter\n");
+    uint32 u32TurnOnMask = 0;
+    uint32 u32TurnOffMask = 0;
+    uint8 i;
 
-    // if (u32ToggleMask > 0)
-    // {
-    //     uint32 u32CurrentState = u32AHI_DioReadInput();
-    //     vAHI_DioSetOutput(u32CurrentState ^ u32ToggleMask, u32CurrentState & u32ToggleMask);
-    // }
+    for (i = 0; i < MAX_BLINKS; i++)
+    {
+        if (sBlinkStates[i].u8Cycles > 0)
+        {
+            if (sBlinkStates[i].bIsOn)
+            {
+                u32TurnOffMask |= sBlinkStates[i].u32Mask;
+                sBlinkStates[i].bIsOn = FALSE;
+            }
+            else
+            {
+                u32TurnOnMask |= sBlinkStates[i].u32Mask;
+                sBlinkStates[i].bIsOn = TRUE;
+            }
+            sBlinkStates[i].u8Cycles--;
 
-    // if (bNeedAnotherCycle)
-    // {
-    //     DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Restart\n");
-    //     ZTIMER_eStart(u8LedBlinkTimer, APP_LED_BLINK_INTERVAL);
-    // }
-    // else
-    // {
-    //     DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Stop\n");
-    //     vAHI_DioSetOutput(APP_LEDS_CTRL_MASK, 0);
-    //     ZTIMER_eStop(u8LedBlinkTimer);
-    // }
+            if (sBlinkStates[i].u8Cycles == 0)
+            {
+                sBlinkStates[i].u32Mask = 0;
+            }
+        }
+    }
+
+    if (u32TurnOffMask || u32TurnOnMask)
+    {
+        vAHI_DioSetOutput(u32TurnOnMask, u32TurnOffMask);
+        DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Restart\n");
+        ZTIMER_eStart(u8TimerLedBlink, LED_BLINK_INTERVAL);
+    }
+    else
+    {
+        DBG_vPrintf(TRACE_LED, "LED: Blink Timer Callback - Stop\n");
+        vAHI_DioSetOutput(sDeviceConfig.sDioConfig.u32LedMask, 0);
+    }
 }

@@ -11,6 +11,7 @@
 #include "app_battery.h"
 #include "app_button_actions.h"
 #include "app_events.h"
+#include "app_led.h"
 #include "app_node.h"
 #include "app_polling.h"
 #include "app_resources.h"
@@ -76,7 +77,9 @@ PUBLIC void APP_vProcessEvents(void)
             if (eGetNodeState() == E_NO_NETWORK)
             {
                 DBG_vPrintf(TRACE_EVENTS, "APP EVENTS: Device is not in network. Starting NWK Steering...\n");
-                // APP_vBlinkLed(BLINK_BOTH, 5);
+                if (sDeviceConfig.sResetButtonConfig.bHasLed) {
+                    APP_vBlinkLed(sDeviceConfig.sResetButtonConfig.u32LedMask, 5);
+                }
                 BDB_eNsStartNwkSteering();
                 break;
             }

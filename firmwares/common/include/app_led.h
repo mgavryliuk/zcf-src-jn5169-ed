@@ -10,23 +10,16 @@
 #define TRACE_LED FALSE
 #endif
 
-#define APP_LED_BLINK_INTERVAL ZTIMER_TIME_MSEC(100)
-
-typedef enum
-{
-    BLINK_LED1,
-    BLINK_LED2,
-    BLINK_BOTH,
-    BLINK_NONE,
-} te_BlinkMode;
+#define LED_BLINK_INTERVAL ZTIMER_TIME_MSEC(100)
 
 typedef struct
 {
     uint32 u32Mask;
-    uint8 u8Amount;
-} ts_BlinkConfig;
+    uint8 u8Cycles;
+    bool_t bIsOn;
+} ts_BlinkState;
 
 PUBLIC void APP_vSetupLeds(void);
-PUBLIC void APP_vBlinkLed(te_BlinkMode eBlinkMode, uint8 u8Amount);
+PUBLIC void APP_vBlinkLed(uint32 u32LedMask, uint8 u8BlinkCount);
 
 #endif /* APP_LED_H */
