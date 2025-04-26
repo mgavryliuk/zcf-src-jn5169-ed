@@ -31,7 +31,6 @@ typedef struct
 
 typedef struct
 {
-    const char *sDeviceModelId;
     const uint8_t u8BasicEndpoint;
     const uint8_t u8ZdoEndpoint;
 

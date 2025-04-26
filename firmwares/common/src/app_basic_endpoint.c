@@ -76,11 +76,9 @@ PUBLIC void APP_vRegisterBasicEndPoint(void)
     }
 
     memcpy(sBasicEndpoint.sBasicServerCluster.au8ManufacturerName, CLD_BAS_MANUF_NAME_STR, CLD_BAS_MANUF_NAME_SIZE);
-    // TODO: fix this
-    memcpy(sBasicEndpoint.sBasicServerCluster.au8ModelIdentifier, sDeviceConfig.sDeviceModelId, strlen(sDeviceConfig.sDeviceModelId));
+    memcpy(sBasicEndpoint.sBasicServerCluster.au8ModelIdentifier, CLD_BAS_MODEL_STR, CLD_BAS_MODEL_ID_SIZE);
     memcpy(sBasicEndpoint.sBasicServerCluster.au8DateCode, CLD_BAS_DATE_STR, CLD_BAS_DATE_SIZE);
     memcpy(sBasicEndpoint.sBasicServerCluster.au8SWBuildID, CLD_BAS_SW_BUILD_STR, CLD_BAS_SW_BUILD_SIZE);
-    DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Model identifier: %s (%d)\n", sBasicEndpoint.sBasicServerCluster.au8ModelIdentifier, strlen(sBasicEndpoint.sBasicServerCluster.au8ModelIdentifier));
 
     DBG_vPrintf(TRACE_BASIC_EP, "BASIC EP: Configuring voltage attribute to be reportable\n");
     eZCL_Status = eZCL_SetReportableFlag(sDeviceConfig.u8BasicEndpoint, GENERAL_CLUSTER_ID_POWER_CONFIGURATION, TRUE, FALSE, E_CLD_PWRCFG_ATTR_ID_BATTERY_VOLTAGE);

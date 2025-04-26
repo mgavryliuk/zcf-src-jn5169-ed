@@ -14,7 +14,6 @@ PRIVATE const tsEndpointButtonConfig sButtonsConfigs[] = {
 };
 
 const tsDeviceConfig sDeviceConfig = {
-    .sDeviceModelId = "lumi.remote.b1acn01.diy",
     .u8BasicEndpoint = WXKG11LM_BASIC_ENDPOINT,
     .u8ZdoEndpoint = WXKG11LM_ZDO_ENDPOINT,
     .sDioConfig = {

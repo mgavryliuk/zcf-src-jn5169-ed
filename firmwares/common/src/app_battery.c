@@ -56,5 +56,5 @@ PRIVATE void vMeasureBattery(void) {
     DBG_vPrintf(TRACE_BATTERY, "BATTERY: Search for cluster entry %d in endpoint %d status: %d\n", GENERAL_CLUSTER_ID_POWER_CONFIGURATION, sDeviceConfig.u8BasicEndpoint, eStatus);
 
     ((tsCLD_PowerConfiguration *)psZCL_ClusterInstance->pvEndPointSharedStructPtr)->u8BatteryVoltage = (uint8)(u16BattLevelmV / 100);
-    ((tsCLD_PowerConfiguration *)psZCL_ClusterInstance->pvEndPointSharedStructPtr)->u8BatteryPercentageRemaining = u8BatteryPercentageRemaining;
+    ((tsCLD_PowerConfiguration *)psZCL_ClusterInstance->pvEndPointSharedStructPtr)->u8BatteryPercentageRemaining = u8BatteryPercentageRemaining * 2;
 }

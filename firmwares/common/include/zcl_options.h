@@ -3,6 +3,7 @@
 
 #include <jendefs.h>
 #include "device_config.h"
+#include "device_zcl_options.h"
 
 /****************************************************************************/
 /***        Macro Definitions                                             ***/
