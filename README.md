@@ -16,6 +16,17 @@ This project uses VS Code and [Dev Containers](https://code.visualstudio.com/doc
 3. Download SDK `JN-SW-4170` from NXP site and add into sdk directory.
 4. Click the `Build` button to compile the project.
 
+> **Note!** Function `eZCL_ReportAttribute` in `sdk/Components/ZCIF/Source/zcl.c` was adjusted manually to disable default response.
+> ```c
+>        // Write command header
+>        u16Offset = u16ZCL_WriteCommandHeader(
+>              hAPduInst, eFrameType,
+>              FALSE, 0,
+>              TRUE,
+>              TRUE, // changed by hands to disable default response. Original: FALSE
+>              u8Seq, E_ZCL_REPORT_ATTRIBUTES);
+> ```
+
 # Devices
 | Device | Description | Documentation | Build Preset |
 |--------|-------------|---------------|--------------|
@@ -37,3 +48,12 @@ This project uses VS Code and [Dev Containers](https://code.visualstudio.com/doc
 [JN516x Integrated Peripherals API (JN-UG-3087)](docs/JN-UG-3087.pdf)</br>
 [JN51xx Production Flash Programmer (JN-UG-3099)](docs/JN-UG-3099.pdf)</br>
 [JN51xx Boot Loader Operation (JN-AN-1003)](docs/JN-AN-1003.pdf)
+
+## Support the Project
+If you find this project helpful, please consider supporting the development. Due to limited payment options available in Ukraine, these are currently the only ways to support the project:
+* becoming a patron on [Patreon](https://www.patreon.com/mgavryliuk) to help fund ongoing development and maintenance
+* make a one-time contribution through the [Patreon store](https://www.patreon.com/mgavryliuk/shop)
+
+Your support allows me to dedicate more time to improving and expanding the custom firmware options.
+
+**Thank you!**
